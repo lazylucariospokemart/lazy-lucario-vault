@@ -5,6 +5,7 @@
   "count": 102,
   "discord": "https://discord.gg/PWGYVXAUZP",
   "freeShipAt": 150,
+  "orderApi": "https://vault-orders.lazylucariospokemart28.workers.dev",
   "shipping": 5,
   "source": "Card Vault",
   "unique": 102,
