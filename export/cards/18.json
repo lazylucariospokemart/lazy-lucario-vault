@@ -1,5 +1,6 @@
 {
   "added": "2026-10-18",
+  "ask": 100,
   "chg7": -1.2,
   "cond": "NM",
   "img": "566543",
@@ -11,5 +12,6 @@
   "printing": "Holofoil - Japanese",
   "qty": 1,
   "rarity": "Special Art Rare",
-  "set": "SV2a: Pokemon Card 151"
+  "set": "SV2a: Pokemon Card 151",
+  "sold": false
 }

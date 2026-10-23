@@ -1,5 +1,6 @@
 {
   "added": "2026-10-18",
+  "ask": 200,
   "chg7": -4.18,
   "cond": "NM",
   "img": "88712",
@@ -11,5 +12,6 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Ultra Rare",
-  "set": "Legendary Treasures: Radiant Collection"
+  "set": "Legendary Treasures: Radiant Collection",
+  "sold": false
 }

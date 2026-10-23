@@ -1,6 +1,10 @@
 {
+  "bundleMax": 10,
+  "bundlePct": 2.5,
+  "cashapp": "Finney1992",
   "count": 102,
   "discord": "https://discord.gg/PWGYVXAUZP",
+  "freeShipAt": 150,
   "shipping": 5,
   "source": "Card Vault",
   "unique": 102,
