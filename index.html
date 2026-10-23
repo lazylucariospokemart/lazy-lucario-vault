@@ -137,6 +137,13 @@ nav.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);borde
 .lqty .lp{font-size:14px;font-weight:600}
 .rm{border:0;background:none;color:var(--muted);font-size:11px;text-decoration:underline;padding:0}
 .cta.pay{grid-template-columns:1fr 1fr}
+.form .sect{font:800 10.5px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--fg);margin-top:8px}
+.payopt{display:flex;gap:10px;flex-wrap:wrap}
+.form label.radio{display:flex;flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font:600 14px var(--body);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;flex:1 1 140px;cursor:pointer}
+.form label.radio input{width:auto}
+.form label.radio:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.form .btn.wide{grid-column:1/-1;padding:12px}
+.note.down{color:var(--down)}
 .sum div.why{font-size:12px;padding-block:5px}
 @media (max-width:420px){.cta.pay{grid-template-columns:1fr}}
 .btn.ghost{flex:0 0 auto;color:var(--muted)}
@@ -240,7 +247,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     <b>How buying works</b>
     <span class="step"><span class="n">1</span><b>Add cards</b> to your cart: <b id="bundleTxt">2.5% off per card, up to 10%</b> · free shipping at <b id="freeTxt">$150 or 4+ cards</b></span>
     <span class="step"><span class="n">2</span>Pay the total on <b>Venmo</b> or <b>Cash App</b></span>
-    <span class="step"><span class="n">3</span>DM the order note + address on Discord</span>
+    <span class="step"><span class="n">3</span><span id="step3">DM the order note + address on Discord</span></span>
     <span class="step"><span class="n">4</span>Ships tracked within 2 business days</span>
   </div>
   <div class="grid" id="grid"><div class="empty">Opening the vault… cards appear here as soon as the inventory loads.</div></div>
@@ -277,7 +284,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   let cards=[], priv=null, meta=null, db=null, byId={};
   const rarityCls=r=>/(secret|hyper|special|mega|classic)/i.test(r)?'gold':/(ultra|illustration|art|double|super)/i.test(r)?'vio':/(holo|promo)/i.test(r)?'teal':'';
   const askOf=c=>(c.ask!=null&&c.ask!=='')?c.ask:c.price;
-  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5,bundleMax:(meta&&meta.bundleMax!=null)?meta.bundleMax:10});
+  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5,bundleMax:(meta&&meta.bundleMax!=null)?meta.bundleMax:10,orderHook:(meta&&meta.orderHook)||''});
 
   // ---- tabs (hash: #cards / #owner)
   function showTab(t){
@@ -430,7 +437,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
           ${t.ship?`<div class="why"><span>Free shipping at ${money(s.freeShipAt)}${toFree>0?` (${money(toFree)} more)`:''} or with ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards</span><span></span></div>`:''}
           <div><span>Total</span><span class="num">${money(t.total)}</span></div>
         </div>
-        <ol class="steps">
+        ${canSend()?orderForm(s,t):`<ol class="steps">
           <li><b>Pay ${money(t.total)}</b> with Venmo (@${esc(s.venmo)}) or Cash App ($${esc(s.cashapp)}). Both links prefill the amount.</li>
           <li><b>Copy the order note</b>, add your shipping address, and DM it in Discord.</li>
           <li>Ships ${t.ship?'tracked':'free, tracked'} within 2 business days.</li>
@@ -444,12 +451,89 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
           <a class="btn" href="${esc(s.discord)}" target="_blank" rel="noopener">Open Discord to send it</a>
         </div>
         <textarea class="order" id="noteBox" aria-label="Order note" readonly>${esc(orderNote())}</textarea>
-        <p class="note">If the amount doesn't prefill on desktop, type the total from the note. Venmo <span class="num">@${esc(s.venmo)}</span> · Cash App <span class="num">$${esc(s.cashapp)}</span></p>`}
+        <p class="note">If the amount doesn't prefill on desktop, type the total from the note. Venmo <span class="num">@${esc(s.venmo)}</span> · Cash App <span class="num">$${esc(s.cashapp)}</span></p>`}`}
       </div></div>`;
     $('buy').hidden=false; $('closeBuy').onclick=closeBuy;
     const cp=$('copyNote');
     if(cp)cp.onclick=()=>{const t2=$('noteBox').value;const done=()=>{cp.textContent='Copied — paste it in Discord';setTimeout(()=>cp.textContent='Copy order note',2500)};
       (navigator.clipboard?navigator.clipboard.writeText(t2).then(done):Promise.reject()).catch(()=>{$('noteBox').focus();$('noteBox').select();cp.textContent='Select all and copy'})};
+    const of=$('orderForm'); if(of){restoreForm();of.addEventListener('input',()=>{saveForm();const m=$('orderMsg');if(m.classList.contains('down')){m.className='note wide';m.textContent='Next you\'ll pay in the app you picked. Ships within 2 business days of payment.'}});of.addEventListener('submit',e=>{e.preventDefault();sendOrder()})}
+  }
+
+  // ---- send order (static site only: posts the order to Lazy's private Discord channel)
+  function canSend(){return !!(window.VAULT_DATA&&shop().orderHook)}
+  const FORM_FIELDS=['o_name','o_addr1','o_addr2','o_city','o_state','o_zip','o_contact','o_paidname'];
+  function orderForm(s,t){
+    return `<form class="form" id="orderForm" novalidate>
+      <div class="wide sect">Ship to</div>
+      <label class="wide">Full name<input id="o_name" autocomplete="name" maxlength="80" required></label>
+      <label class="wide">Street address<input id="o_addr1" autocomplete="address-line1" maxlength="120" required></label>
+      <label class="wide">Apt, suite (optional)<input id="o_addr2" autocomplete="address-line2" maxlength="80"></label>
+      <label>City<input id="o_city" autocomplete="address-level2" maxlength="60" required></label>
+      <label>State<input id="o_state" autocomplete="address-level1" maxlength="30" required></label>
+      <label>ZIP<input id="o_zip" autocomplete="postal-code" maxlength="12" inputmode="numeric" required></label>
+      <div class="wide sect">Payment</div>
+      <div class="wide payopt"><label class="radio"><input type="radio" name="o_app" value="Venmo" checked> Venmo <span class="why">@${esc(s.venmo)}</span></label><label class="radio"><input type="radio" name="o_app" value="Cash App"> Cash App <span class="why">$${esc(s.cashapp)}</span></label></div>
+      <label class="wide">Name on your Venmo / Cash App<input id="o_paidname" maxlength="80" required></label>
+      <label class="wide">Discord username or email (so we can reach you)<input id="o_contact" maxlength="100" required></label>
+      <button class="btn primary wide" id="sendOrder" type="submit">Send order · ${money(t.total)}</button>
+      <p class="note wide" id="orderMsg">Next you'll pay ${money(t.total)} in the app you picked. Your order ships ${t.ship?'tracked':'free, tracked'} within 2 business days of payment.</p>
+    </form>`;
+  }
+  function saveForm(){try{const o={};FORM_FIELDS.forEach(k=>{if(k!=='o_paidname')o[k]=$(k).value});localStorage.setItem('vault-ship',JSON.stringify(o))}catch(e){}}
+  function restoreForm(){try{const o=JSON.parse(localStorage.getItem('vault-ship')||'{}');Object.entries(o).forEach(([k,v])=>{if($(k)&&!$(k).value)$(k).value=v})}catch(e){}}
+  function recentOrders(){try{return JSON.parse(localStorage.getItem('vault-sent')||'[]').filter(t=>Date.now()-t<3600e3)}catch(e){return[]}}
+  async function sendOrder(){
+    const s=shop(),t=totals(),msg=$('orderMsg'),btn=$('sendOrder');
+    const v=k=>$(k).value.trim();
+    const missing=FORM_FIELDS.filter(k=>k!=='o_addr2'&&!v(k));
+    if(missing.length){msg.textContent='Fill in every field except apartment.';msg.className='note wide down';$(missing[0]).focus();return}
+    if(!t.lines.length){openCart();return}
+    const recent=recentOrders(); if(recent.length>=3){msg.textContent='Too many orders from this browser in the last hour. DM us on Discord instead.';msg.className='note wide down';return}
+    const app=(document.querySelector('input[name=o_app]:checked')||{}).value||'Venmo';
+    const id='LV-'+Date.now().toString(36).slice(-5).toUpperCase();
+    const clip=(x,n)=>x.length>n?x.slice(0,n-1)+'…':x;
+    const items=clip(t.lines.map(x=>`• ${x.c.name} (${x.c.set} #${x.c.number}) · ${x.c.cond}${x.q>1?' ×'+x.q:''} — ${money(askOf(x.c)*x.q)}`).join('\n'),1000);
+    const addr=[v('o_name'),v('o_addr1'),v('o_addr2'),`${v('o_city')}, ${v('o_state')} ${v('o_zip')}`].filter(Boolean).join('\n');
+    const payload={username:'Vault Orders',allowed_mentions:{parse:[]},
+      content:`🛒 **New order ${id}** — ${money(t.total)} via ${app} (check for payment before shipping)`,
+      embeds:[{title:`Order ${id}`,color:0x5b3df5,timestamp:new Date().toISOString(),fields:[
+        {name:`Cards (${t.units})`,value:items||'—'},
+        {name:'Subtotal',value:money(t.sub),inline:true},
+        {name:'Discount',value:t.disc?`−${money(t.disc)} (${t.rate}%)`:'none',inline:true},
+        {name:'Shipping',value:t.ship?money(t.ship):'FREE',inline:true},
+        {name:'TOTAL',value:`**${money(t.total)}**`,inline:true},
+        {name:'Paying with',value:clip(`${app} · from "${v('o_paidname')}"`,200),inline:true},
+        {name:'Ship to',value:clip(addr,500)},
+        {name:'Contact',value:clip(v('o_contact'),200)}]}]};
+    btn.disabled=true; btn.textContent='Sending…';
+    try{
+      const fd=new FormData(); fd.append('payload_json',JSON.stringify(payload));
+      await fetch(s.orderHook,{method:'POST',body:fd,mode:'no-cors'});
+    }catch(err){btn.disabled=false;btn.textContent='Try again';msg.textContent='Could not send the order (check your connection). Your cart is saved.';msg.className='note wide down';return}
+    try{recent.push(Date.now());localStorage.setItem('vault-sent',JSON.stringify(recent))}catch(e){}
+    const placed={id,app,total:t.total,units:t.units,ship:t.ship};
+    cart={}; saveCart(); updateCartBtn(); render(); showPlaced(placed);
+  }
+  function showPlaced(o){
+    view='placed'; const s=shop();
+    const venmo=`https://venmo.com/u/${encodeURIComponent(s.venmo)}?txn=pay&amount=${o.total.toFixed(2)}&note=${encodeURIComponent('Lazy Lucario Vault '+o.id)}`;
+    const cash=`https://cash.app/$${encodeURIComponent(s.cashapp)}/${o.total.toFixed(2)}`;
+    const isV=o.app==='Venmo';
+    $('buy').innerHTML=`<div class="sheet one" role="dialog" aria-label="Order sent">
+      <button class="close" id="closeBuy" aria-label="Close">×</button>
+      <div>
+        <div class="eyebrow"><i></i> Order received</div>
+        <h2 style="margin-top:8px">Order ${esc(o.id)} is in. Last step: pay.</h2>
+        <div class="sum"><div><span>Total due</span><span class="num">${money(o.total)}</span></div></div>
+        <ol class="steps">
+          <li><b>Pay ${money(o.total)}</b> on ${esc(o.app)} to ${isV?'@'+esc(s.venmo):'$'+esc(s.cashapp)}${isV?'. The note is prefilled with your order number.':`. Put <b>${esc(o.id)}</b> in the note.`}</li>
+          <li>Your ${o.units} card${o.units>1?'s':''} ship${o.units>1?'':'s'} ${o.ship?'tracked':'free, tracked'} within 2 business days of payment.</li>
+        </ol>
+        <div class="cta"><a class="btn ${isV?'venmo':'cash'}" href="${isV?venmo:cash}" target="_blank" rel="noopener">Pay ${money(o.total)} on ${esc(o.app)}</a></div>
+        <p class="note">Questions? <a href="${esc(s.discord)}" target="_blank" rel="noopener">Message us on Discord</a> with order ${esc(o.id)}.</p>
+      </div></div>`;
+    $('buy').hidden=false; $('closeBuy').onclick=closeBuy;
   }
   $('buy').addEventListener('click',e=>{
     if(e.target===$('buy')){closeBuy();return}
@@ -530,7 +614,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     $('stDate').textContent=d?new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—';
     $('footNote').textContent=meta?`Last sync ${meta.updated}`:'';
     const s=shop();
-    const dh=$('discordHero'); if(dh) dh.href=s.discord; $('bundleTxt').textContent=`${s.bundlePct}% off per card, up to ${s.bundleMax}%`; $('freeTxt').textContent=`${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards`;
+    const dh=$('discordHero'); if(dh) dh.href=s.discord; if(canSend()){$('step3').textContent='Send your order with your address, right from the cart'} $('bundleTxt').textContent=`${s.bundlePct}% off per card, up to ${s.bundleMax}%`; $('freeTxt').textContent=`${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards`;
     $('shopSettings').innerHTML=`Venmo <b>@${esc(s.venmo)}</b> · Cash App <b>$${esc(s.cashapp)}</b> · Bundle <b>${s.bundlePct}% per card</b> off 2+ cards (max ${s.bundleMax}%, free shipping at the max) · Free shipping at <b>${money(s.freeShipAt)}</b> · Discord <a href="${esc(s.discord)}" target="_blank" rel="noopener">${esc(s.discord.replace('https://',''))}</a> · Shipping <b>${money(s.ship)}</b> flat`;
   }
 
@@ -577,7 +661,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       cards=snap.docs.filter(d=>d.exists).map(d=>({id:Number(d.id),...d.data()}));
       byId={}; cards.forEach(c=>byId[c.id]=c);
       rebuildFilters(); renderMeta(); render();
-      updateCartBtn(); if(view==='cart')openCart(); else if(cur){if(byId[cur.id]){cur=byId[cur.id];drawBuy()}else closeBuy()}
+      updateCartBtn(); if(view==='placed'){} else if(view==='cart')openCart(); else if(cur){if(byId[cur.id]){cur=byId[cur.id];drawBuy()}else closeBuy()}
     },e=>{$('grid').innerHTML=`<div class="empty">Could not load the inventory (${esc(e.code)}). Reload to try again.</div>`});
     db.doc('meta/site').onSnapshot(s=>{meta=s.exists?s.data():null;renderMeta()});
     db.doc('private/summary').onSnapshot(s=>{priv=s.exists?s.data():null;renderOwner();renderMeta();render();
