@@ -120,6 +120,25 @@ nav.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);borde
 .btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
 .btn.primary{background:linear-gradient(100deg,var(--accent),var(--accent-2));color:#fff;border-color:transparent}
 .btn.venmo{background:var(--venmo);color:#fff;border-color:transparent}
+.btn.cash{background:#00d632;color:#062b10;border-color:transparent}
+.who{display:flex;gap:8px}
+.pill.cartb{cursor:pointer}
+.pill.cartb.has{background:var(--fg);color:var(--bg);border-color:transparent}
+#cartN:not(:empty){background:var(--accent-2);color:#fff;border-radius:999px;padding:0 7px;font-size:10.5px}
+.sheet.one{grid-template-columns:1fr;max-width:640px}
+.perks{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:12.5px;color:var(--muted)}
+.lines{display:grid;gap:8px;margin-top:12px}
+.line{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px}
+.line .thumb{width:48px;aspect-ratio:314/437;border-radius:5px;overflow:hidden;background:var(--surface-2)}
+.line .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.line .name{font-family:var(--display);font-size:12.5px;font-weight:700;line-height:1.2}
+.line .set{font-size:11.5px;color:var(--muted)}
+.lqty{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.lqty .lp{font-size:14px;font-weight:600}
+.rm{border:0;background:none;color:var(--muted);font-size:11px;text-decoration:underline;padding:0}
+.cta.pay{grid-template-columns:1fr 1fr}
+.sum div.why{font-size:12px;padding-block:5px}
+@media (max-width:420px){.cta.pay{grid-template-columns:1fr}}
 .btn.ghost{flex:0 0 auto;color:var(--muted)}
 .btn:disabled{opacity:.5;cursor:default;transform:none}
 .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:56px 16px;border:1px dashed var(--line);border-radius:16px;background:var(--surface)}
@@ -174,7 +193,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
 <div class="wrap">
 <header>
   <div class="hero">
-    <div class="who"><span class="pill" id="whoPill">Browsing</span></div>
+    <div class="who"><button class="pill cartb" id="cartBtn" hidden>🛒 Cart <span id="cartN"></span></button><span class="pill" id="whoPill">Browsing</span></div>
     <div class="hero-in">
       <div>
         <div class="eyebrow"><i></i> Live binder · priced daily</div>
@@ -219,8 +238,8 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   </div>
   <div class="howto" id="howto">
     <b>How buying works</b>
-    <span class="step"><span class="n">1</span>Tap <b>Buy</b> on a card</span>
-    <span class="step"><span class="n">2</span>Pay the total on Venmo</span>
+    <span class="step"><span class="n">1</span><b>Add cards</b> to your cart (2+ cards = <b id="bundleTxt">2.5%</b> off, free shipping at <b id="freeTxt">$150</b>)</span>
+    <span class="step"><span class="n">2</span>Pay the total on <b>Venmo</b> or <b>Cash App</b></span>
     <span class="step"><span class="n">3</span>DM the order note + address on Discord</span>
     <span class="step"><span class="n">4</span>Ships tracked within 2 business days</span>
   </div>
@@ -258,7 +277,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   let cards=[], priv=null, meta=null, db=null, byId={};
   const rarityCls=r=>/(secret|hyper|special|mega|classic)/i.test(r)?'gold':/(ultra|illustration|art|double|super)/i.test(r)?'vio':/(holo|promo)/i.test(r)?'teal':'';
   const askOf=c=>(c.ask!=null&&c.ask!=='')?c.ask:c.price;
-  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5});
+  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5});
 
   // ---- tabs (hash: #cards / #owner)
   function showTab(t){
@@ -308,11 +327,12 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         ${c.notes?`<div class="set" style="font-style:italic">${esc(c.notes)}</div>`:''}<div class="badges"><span class="b cond">${esc(c.cond)}</span>${c.printing?`<span class="b">${esc(c.printing.replace(' - Japanese',''))}</span>`:''}${c.language==='Japanese'?'<span class="b jp">JP</span>':''}${c.rarity&&c.rarity!=='None'?`<span class="b ${rarityCls(c.rarity)}">${esc(c.rarity)}</span>`:''}${c.qty>1?`<span class="b">×${c.qty}</span>`:''}</div>
         <div class="price" data-pricebox="${c.id}"><span class="p">${ask==null?'<span class="warn" style="font-size:13px">ask for price</span>':money(ask)}</span><span class="chg ${cls(c.chg7)}">${c.chg7==null?'':pct(c.chg7)+' 7d'}</span></div>
         ${priv?`<div class="own"><span>paid ${money(cost)}</span><span class="${cls(pnl)}">${signed(pnl)}</span></div>`:''}
-        <div class="actions">${canBuy?`<button class="btn primary" data-open="${c.id}">Buy</button>`:`<button class="btn" disabled>${c.sold?'Sold':'Message for price'}</button>`}${priv?`<button class="btn ghost" data-edit="${c.id}">Edit</button><button class="btn ghost" data-sold="${c.id}">${c.sold?'Relist':'Mark sold'}</button>`:''}</div>
+        <div class="actions">${canBuy?`<button class="btn primary" data-add="${c.id}">${cart[c.id]?'In cart ✓':'Add to cart'}</button>`:`<button class="btn" disabled>${c.sold?'Sold':'Message for price'}</button>`}${priv?`<button class="btn ghost" data-edit="${c.id}">Edit</button><button class="btn ghost" data-sold="${c.id}">${c.sold?'Relist':'Mark sold'}</button>`:''}</div>
       </article>`}).join('');
   }
   $('grid').addEventListener('click',async e=>{
     const o=e.target.closest('[data-open]'); if(o){openBuy(Number(o.dataset.open));return}
+    const ad=e.target.closest('[data-add]'); if(ad){addToCart(ad.dataset.add,1);ad.textContent='In cart ✓';return}
     const ed=e.target.closest('[data-edit]'); if(ed&&db){openEdit(Number(ed.dataset.edit));return}
     const pb=e.target.closest('[data-price]'); if(pb&&db){
       const c=byId[pb.dataset.price]; const box=document.querySelector(`[data-pricebox="${c.id}"]`);
@@ -331,21 +351,35 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     }
   });
 
-  // ---- buy sheet
+  // ---- cart
+  let cart={}; // id -> qty
+  try{cart=JSON.parse(localStorage.getItem('vault-cart')||'{}')||{}}catch(e){cart={}}
+  function saveCart(){try{localStorage.setItem('vault-cart',JSON.stringify(cart))}catch(e){}}
+  function cartLines(){return Object.entries(cart).map(([id,q])=>({c:byId[id],q})).filter(x=>x.c&&!x.c.sold&&askOf(x.c)!=null).map(x=>({...x,q:Math.min(x.q,x.c.qty||1)}))}
+  function cartCount(){return cartLines().reduce((n,x)=>n+x.q,0)}
+  function totals(){
+    const s=shop(),lines=cartLines();
+    const sub=lines.reduce((n,x)=>n+askOf(x.c)*x.q,0);
+    const units=lines.reduce((n,x)=>n+x.q,0);
+    const disc=units>=2?Math.round(sub*s.bundlePct)/100:0;
+    const after=sub-disc;
+    const ship=lines.length?(after>=s.freeShipAt?0:s.ship):0;
+    return {lines,sub,units,disc,after,ship,total:after+ship};
+  }
+  function addToCart(id,q){const c=byId[id];if(!c)return;cart[id]=Math.min((cart[id]||0)+q,c.qty||1);saveCart();updateCartBtn()}
+  function updateCartBtn(){const n=cartCount();$('cartBtn').hidden=false;$('cartN').textContent=n?String(n):'';$('cartBtn').classList.toggle('has',n>0)}
+  $('cartBtn').addEventListener('click',openCart);
+
+  // ---- card sheet (details + add to cart)
   let cur=null, qty=1;
   function openBuy(id){cur=byId[id];if(!cur)return;qty=1;drawBuy();$('buy').hidden=false}
-  function closeBuy(){$('buy').hidden=true;$('buy').innerHTML='';cur=null}
-  function orderNote(){
-    const s=shop(),sub=askOf(cur)*qty,total=sub+s.ship;
-    return `ORDER — Lazy Lucario Vault\n${cur.name} (${cur.set} #${cur.number}) · ${cur.cond} · ${cur.printing}\nQty ${qty} × ${money(askOf(cur))} = ${money(sub)}\nShipping (tracked): ${money(s.ship)}\nTOTAL PAID ON VENMO: ${money(total)}\nVenmo name I paid from: \n\nSHIP TO:\nName: \nAddress: \nCity, State ZIP: `;
-  }
+  function closeBuy(){$('buy').hidden=true;$('buy').innerHTML='';cur=null;view=null}
+  let view=null; // 'card' | 'cart'
   function drawBuy(){
-    if(!cur) return;
-    const s=shop(),sub=askOf(cur)*qty,total=sub+s.ship;
-    const noteShort=`${cur.name} ${cur.number} ${cur.cond} x${qty} + ship`;
-    const venmo=`https://venmo.com/u/${encodeURIComponent(s.venmo)}?txn=pay&amount=${total.toFixed(2)}&note=${encodeURIComponent(noteShort)}`;
-    const unavailable=cur.sold||askOf(cur)==null;
-    $('buy').innerHTML=`<div class="sheet" role="dialog" aria-label="Buy ${esc(cur.name)}">
+    if(!cur) return; view='card';
+    const s=shop(),ask=askOf(cur),inCart=cart[cur.id]||0;
+    const unavailable=cur.sold||ask==null;
+    $('buy').innerHTML=`<div class="sheet" role="dialog" aria-label="${esc(cur.name)}">
       <button class="close" id="closeBuy" aria-label="Close">×</button>
       <div class="pic">${picOf(cur)}${cur.sold?'<div class="stamp">SOLD</div>':''}</div>
       <div>
@@ -353,31 +387,75 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <div class="set">${esc(cur.set)} · #${esc(cur.number)} · ${esc(cur.cond)} · ${esc(cur.printing)}${cur.language==='Japanese'?' · Japanese':''}</div>${cur.notes?`<p class="note" style="font-style:italic;margin:8px 0 0">${esc(cur.notes)}</p>`:''}
         ${unavailable?`<p class="note" style="margin-top:14px">${cur.sold?'This one is sold.':'No market match yet. DM for a price.'}</p>`:`
         <div class="sum">
-          <div><span>Card${cur.qty>1?` <span class="qty" style="display:inline-flex;margin-left:8px"><button id="qm" aria-label="Fewer">−</button><span class="num">${qty}</span><button id="qp" aria-label="More">+</button></span>`:''}</span><span class="num">${money(sub)}</span></div>
-          <div><span>Tracked shipping</span><span class="num">${money(s.ship)}</span></div>
-          <div><span>Total</span><span class="num">${money(total)}</span></div>
+          <div><span>Price${cur.ask!=null&&cur.price!=null?` <small class="why">(market ${money(cur.price)})</small>`:''}</span><span class="num">${money(ask)}</span></div>
+          ${cur.qty>1?`<div><span>Quantity <small class="why">(${cur.qty} available)</small></span><span class="qty"><button id="qm" aria-label="Fewer">−</button><span class="num">${qty}</span><button id="qp" aria-label="More">+</button></span></div>`:''}
         </div>
-        <ol class="steps">
-          <li><b>Pay ${money(total)} on Venmo</b> to @${esc(s.venmo)}. The link below fills in the amount and note.</li>
-          <li><b>Copy the order note</b>, add your shipping address, and DM it in Discord.</li>
-          <li>Ships tracked within 2 business days.</li>
-        </ol>
+        <div class="perks"><span>🎁 ${s.bundlePct}% off any 2+ cards</span><span>📦 Free shipping at ${money(s.freeShipAt)}, else ${money(s.ship)} tracked</span><span>💸 Venmo or Cash App</span></div>
         <div class="cta">
-          <a class="btn venmo" href="${venmo}" target="_blank" rel="noopener">Pay ${money(total)} on Venmo</a>
-          <button class="btn" id="copyNote">Copy order note</button>
-          <a class="btn" href="${esc(s.discord)}" target="_blank" rel="noopener">Open Discord to send it</a>
-        </div>
-        <textarea class="order" id="noteBox" aria-label="Order note" readonly>${esc(orderNote())}</textarea>
-        <p class="note">If the amount doesn't prefill on desktop, type the total from the note. Venmo: <span class="num">@${esc(s.venmo)}</span></p>`}
+          <button class="btn primary" id="addCart">${inCart?`Add ${qty} more (${inCart} in cart)`:'Add to cart'}</button>
+          <button class="btn" id="goCart">${cartCount()?`View cart (${cartCount()})`:'View cart'}</button>
+        </div>`}
       </div></div>`;
     $('closeBuy').onclick=closeBuy;
     const qm=$('qm'),qp=$('qp');
     if(qm){qm.onclick=()=>{if(qty>1){qty--;drawBuy()}};qp.onclick=()=>{if(qty<cur.qty){qty++;drawBuy()}}}
-    const cp=$('copyNote');
-    if(cp)cp.onclick=()=>{const t=$('noteBox').value;const done=()=>{cp.textContent='Copied — paste it in Discord';setTimeout(()=>cp.textContent='Copy order note',2500)};
-      (navigator.clipboard?navigator.clipboard.writeText(t).then(done):Promise.reject()).catch(()=>{$('noteBox').focus();$('noteBox').select();cp.textContent='Select all and copy'})};
+    const ac=$('addCart'); if(ac)ac.onclick=()=>{addToCart(cur.id,qty);openCart()};
+    const gc=$('goCart'); if(gc)gc.onclick=openCart;
   }
-  $('buy').addEventListener('click',e=>{if(e.target===$('buy'))closeBuy()});
+
+  // ---- cart / checkout sheet
+  function orderNote(){
+    const s=shop(),t=totals();
+    const items=t.lines.map(x=>`• ${x.c.name} (${x.c.set} #${x.c.number}) · ${x.c.cond}${x.q>1?` ×${x.q}`:''} — ${money(askOf(x.c)*x.q)}`).join('\n');
+    return `ORDER — Lazy Lucario Vault\n${items}\nSubtotal: ${money(t.sub)}${t.disc?`\nBundle discount (${s.bundlePct}%): −${money(t.disc)}`:''}\nShipping: ${t.ship?money(t.ship)+' tracked':'FREE'}\nTOTAL: ${money(t.total)}\nPaid with (Venmo / Cash App) and name I paid from: \n\nSHIP TO:\nName: \nAddress: \nCity, State ZIP: `;
+  }
+  function openCart(){
+    view='cart'; cur=null; const s=shop(),t=totals();
+    const noteShort=`Lazy Lucario Vault order x${t.units}`;
+    const venmo=`https://venmo.com/u/${encodeURIComponent(s.venmo)}?txn=pay&amount=${t.total.toFixed(2)}&note=${encodeURIComponent(noteShort)}`;
+    const cash=`https://cash.app/$${encodeURIComponent(s.cashapp)}/${t.total.toFixed(2)}`;
+    const toFree=s.freeShipAt-t.after;
+    $('buy').innerHTML=`<div class="sheet one" role="dialog" aria-label="Your cart">
+      <button class="close" id="closeBuy" aria-label="Close">×</button>
+      <div>
+        <h2>Your cart</h2>
+        ${!t.lines.length?`<p class="note" style="margin-top:12px">Nothing in here yet. Tap a card and add it.</p>`:`
+        <div class="lines">${t.lines.map(x=>`<div class="line"><div class="thumb">${picOf(x.c)}</div><div class="lmain"><div class="name">${esc(x.c.name)}</div><div class="set">${esc(x.c.set)} · #${esc(x.c.number)} · ${esc(x.c.cond)}</div></div><div class="lqty"><span class="qty"><button data-dec="${x.c.id}" aria-label="Fewer">−</button><span class="num">${x.q}</span><button data-inc="${x.c.id}" aria-label="More" ${x.q>=(x.c.qty||1)?'disabled':''}>+</button></span><span class="num lp">${money(askOf(x.c)*x.q)}</span><button class="rm" data-rm="${x.c.id}" aria-label="Remove">remove</button></div></div>`).join('')}</div>
+        <div class="sum">
+          <div><span>Subtotal <small class="why">(${t.units} card${t.units>1?'s':''})</small></span><span class="num">${money(t.sub)}</span></div>
+          ${t.disc?`<div class="up"><span>Bundle discount ${s.bundlePct}%</span><span class="num">−${money(t.disc)}</span></div>`:`<div class="why"><span>Add a 2nd card for ${s.bundlePct}% off everything</span><span></span></div>`}
+          <div><span>Shipping${t.ship?' (tracked)':''}</span><span class="num ${t.ship?'':'up'}">${t.ship?money(t.ship):'FREE'}</span></div>
+          ${t.ship&&toFree>0?`<div class="why"><span>${money(toFree)} more for free shipping</span><span></span></div>`:''}
+          <div><span>Total</span><span class="num">${money(t.total)}</span></div>
+        </div>
+        <ol class="steps">
+          <li><b>Pay ${money(t.total)}</b> with Venmo (@${esc(s.venmo)}) or Cash App ($${esc(s.cashapp)}). Both links prefill the amount.</li>
+          <li><b>Copy the order note</b>, add your shipping address, and DM it in Discord.</li>
+          <li>Ships ${t.ship?'tracked':'free, tracked'} within 2 business days.</li>
+        </ol>
+        <div class="cta pay">
+          <a class="btn venmo" href="${venmo}" target="_blank" rel="noopener">Venmo ${money(t.total)}</a>
+          <a class="btn cash" href="${cash}" target="_blank" rel="noopener">Cash App ${money(t.total)}</a>
+        </div>
+        <div class="cta">
+          <button class="btn" id="copyNote">Copy order note</button>
+          <a class="btn" href="${esc(s.discord)}" target="_blank" rel="noopener">Open Discord to send it</a>
+        </div>
+        <textarea class="order" id="noteBox" aria-label="Order note" readonly>${esc(orderNote())}</textarea>
+        <p class="note">If the amount doesn't prefill on desktop, type the total from the note. Venmo <span class="num">@${esc(s.venmo)}</span> · Cash App <span class="num">$${esc(s.cashapp)}</span></p>`}
+      </div></div>`;
+    $('buy').hidden=false; $('closeBuy').onclick=closeBuy;
+    const cp=$('copyNote');
+    if(cp)cp.onclick=()=>{const t2=$('noteBox').value;const done=()=>{cp.textContent='Copied — paste it in Discord';setTimeout(()=>cp.textContent='Copy order note',2500)};
+      (navigator.clipboard?navigator.clipboard.writeText(t2).then(done):Promise.reject()).catch(()=>{$('noteBox').focus();$('noteBox').select();cp.textContent='Select all and copy'})};
+  }
+  $('buy').addEventListener('click',e=>{
+    if(e.target===$('buy')){closeBuy();return}
+    const d=e.target.closest('[data-dec]'),i=e.target.closest('[data-inc]'),r=e.target.closest('[data-rm]');
+    if(d){const id=d.dataset.dec;cart[id]=(cart[id]||1)-1;if(cart[id]<1)delete cart[id];saveCart();updateCartBtn();openCart()}
+    else if(i){addToCart(i.dataset.inc,1);openCart()}
+    else if(r){delete cart[r.dataset.rm];saveCart();updateCartBtn();openCart()}
+  });
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('buy').hidden)closeBuy()});
 
   // ---- owner edit sheet
@@ -450,8 +528,8 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     $('stDate').textContent=d?new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—';
     $('footNote').textContent=meta?`Last sync ${meta.updated}`:'';
     const s=shop();
-    const dh=$('discordHero'); if(dh) dh.href=s.discord;
-    $('shopSettings').innerHTML=`Venmo <b>@${esc(s.venmo)}</b> · Discord <a href="${esc(s.discord)}" target="_blank" rel="noopener">${esc(s.discord.replace('https://',''))}</a> · Shipping <b>${money(s.ship)}</b> flat`;
+    const dh=$('discordHero'); if(dh) dh.href=s.discord; $('bundleTxt').textContent=s.bundlePct+'%'; $('freeTxt').textContent=money(s.freeShipAt);
+    $('shopSettings').innerHTML=`Venmo <b>@${esc(s.venmo)}</b> · Cash App <b>$${esc(s.cashapp)}</b> · Bundle <b>${s.bundlePct}%</b> off 2+ cards · Free shipping at <b>${money(s.freeShipAt)}</b> · Discord <a href="${esc(s.discord)}" target="_blank" rel="noopener">${esc(s.discord.replace('https://',''))}</a> · Shipping <b>${money(s.ship)}</b> flat`;
   }
 
   // ---- owner desk
@@ -489,7 +567,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     if(window.VAULT_DATA){ // static export: data baked in, no owner tools
       const D=window.VAULT_DATA; meta=D.meta||null;
       cards=Object.entries(D.cards).map(([id,d])=>({id:Number(id),...d})); byId={}; cards.forEach(c=>byId[c.id]=c);
-      rebuildFilters(); renderMeta(); render(); return;
+      rebuildFilters(); renderMeta(); render(); updateCartBtn(); return;
     }
     db=await claude.use('db');
     if(!db){$('grid').innerHTML='<div class="empty">Sign in to view the vault inventory.</div>';return}
@@ -497,7 +575,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       cards=snap.docs.filter(d=>d.exists).map(d=>({id:Number(d.id),...d.data()}));
       byId={}; cards.forEach(c=>byId[c.id]=c);
       rebuildFilters(); renderMeta(); render();
-      if(cur){if(byId[cur.id]){cur=byId[cur.id];drawBuy()}else closeBuy()}
+      updateCartBtn(); if(view==='cart')openCart(); else if(cur){if(byId[cur.id]){cur=byId[cur.id];drawBuy()}else closeBuy()}
     },e=>{$('grid').innerHTML=`<div class="empty">Could not load the inventory (${esc(e.code)}). Reload to try again.</div>`});
     db.doc('meta/site').onSnapshot(s=>{meta=s.exists?s.data():null;renderMeta()});
     db.doc('private/summary').onSnapshot(s=>{priv=s.exists?s.data():null;renderOwner();renderMeta();render();
