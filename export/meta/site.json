@@ -5,6 +5,7 @@
   "count": 102,
   "discord": "https://discord.gg/PWGYVXAUZP",
   "freeShipAt": 150,
+  "orderHook": "https://discord.com/api/webhooks/1563309438109089914/rBSCRnYjLAkugmZGKzrUwhhUcGo7hbkwp833kTV-H_5pPJfibtkS83k4u-Sjyyop4g7S",
   "shipping": 5,
   "source": "Card Vault",
   "unique": 102,
