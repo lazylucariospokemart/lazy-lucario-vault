@@ -2,6 +2,7 @@ name: Deploy site
 on:
   push:
     branches: [main]
+    paths-ignore: ['holds.json']
   workflow_dispatch:
 permissions:
   contents: read

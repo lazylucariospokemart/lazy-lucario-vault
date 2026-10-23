@@ -285,7 +285,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   let cards=[], priv=null, meta=null, db=null, byId={};
   const rarityCls=r=>/(secret|hyper|special|mega|classic)/i.test(r)?'gold':/(ultra|illustration|art|double|super)/i.test(r)?'vio':/(holo|promo)/i.test(r)?'teal':'';
   const askOf=c=>(c.ask!=null&&c.ask!=='')?c.ask:c.price;
-  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5,bundleMax:(meta&&meta.bundleMax!=null)?meta.bundleMax:10,orderHook:(meta&&meta.orderHook)||''});
+  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5,bundleMax:(meta&&meta.bundleMax!=null)?meta.bundleMax:10,orderApi:((meta&&meta.orderApi)||'').replace(/\/$/,'')});
 
   // ---- tabs (hash: #cards / #owner)
   function showTab(t){
@@ -360,6 +360,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   });
 
   // ---- cart
+  let cartNotice='';
   let cart={}; // id -> qty
   try{cart=JSON.parse(localStorage.getItem('vault-cart')||'{}')||{}}catch(e){cart={}}
   function saveCart(){try{localStorage.setItem('vault-cart',JSON.stringify(cart))}catch(e){}}
@@ -378,7 +379,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   }
   function addToCart(id,q){const c=byId[id];if(!c)return;cart[id]=Math.min((cart[id]||0)+q,c.qty||1);saveCart();updateCartBtn()}
   function updateCartBtn(){const n=cartCount();$('cartBtn').hidden=false;$('cartN').textContent=n?String(n):'';$('cartBtn').classList.toggle('has',n>0)}
-  $('cartBtn').addEventListener('click',openCart);
+  $('cartBtn').addEventListener('click',()=>{openCart();if(typeof loadHolds==='function')loadHolds()});
 
   // ---- card sheet (details + add to cart)
   let cur=null, qty=1;
@@ -429,6 +430,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       <button class="close" id="closeBuy" aria-label="Close">×</button>
       <div>
         <h2>Your cart</h2>
+        ${cartNotice?`<p class="note down" style="margin-top:8px">${esc(cartNotice)}</p>`:''}
         ${!t.lines.length?`<p class="note" style="margin-top:12px">Nothing in here yet. Tap a card and add it.</p>`:`
         <div class="lines">${t.lines.map(x=>`<div class="line"><div class="thumb">${picOf(x.c)}</div><div class="lmain"><div class="name">${esc(x.c.name)}</div><div class="set">${esc(x.c.set)} · #${esc(x.c.number)} · ${esc(x.c.cond)}</div></div><div class="lqty"><span class="qty"><button data-dec="${x.c.id}" aria-label="Fewer">−</button><span class="num">${x.q}</span><button data-inc="${x.c.id}" aria-label="More" ${x.q>=(x.c.qty||1)?'disabled':''}>+</button></span><span class="num lp">${money(askOf(x.c)*x.q)}</span><button class="rm" data-rm="${x.c.id}" aria-label="Remove">remove</button></div></div>`).join('')}</div>
         <div class="sum">
@@ -454,7 +456,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <textarea class="order" id="noteBox" aria-label="Order note" readonly>${esc(orderNote())}</textarea>
         <p class="note">If the amount doesn't prefill on desktop, type the total from the note. Venmo <span class="num">@${esc(s.venmo)}</span> · Cash App <span class="num">$${esc(s.cashapp)}</span></p>`}`}
       </div></div>`;
-    $('buy').hidden=false; $('closeBuy').onclick=closeBuy;
+    $('buy').hidden=false; $('closeBuy').onclick=closeBuy; cartNotice='';
     const cp=$('copyNote');
     if(cp)cp.onclick=()=>{const t2=$('noteBox').value;const done=()=>{cp.textContent='Copied — paste it in Discord';setTimeout(()=>cp.textContent='Copy order note',2500)};
       (navigator.clipboard?navigator.clipboard.writeText(t2).then(done):Promise.reject()).catch(()=>{$('noteBox').focus();$('noteBox').select();cp.textContent='Select all and copy'})};
@@ -462,7 +464,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   }
 
   // ---- send order (static site only: posts the order to Lazy's private Discord channel)
-  function canSend(){return !!(window.VAULT_DATA&&shop().orderHook)}
+  function canSend(){return !!(window.VAULT_DATA&&shop().orderApi)}
   const FORM_FIELDS=['o_name','o_addr1','o_addr2','o_city','o_state','o_zip','o_contact','o_paidname'];
   function orderForm(s,t){
     return `<form class="form" id="orderForm" novalidate>
@@ -483,38 +485,42 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   }
   function saveForm(){try{const o={};FORM_FIELDS.forEach(k=>{if(k!=='o_paidname')o[k]=$(k).value});localStorage.setItem('vault-ship',JSON.stringify(o))}catch(e){}}
   function restoreForm(){try{const o=JSON.parse(localStorage.getItem('vault-ship')||'{}');Object.entries(o).forEach(([k,v])=>{if($(k)&&!$(k).value)$(k).value=v})}catch(e){}}
-  function recentOrders(){try{return JSON.parse(localStorage.getItem('vault-sent')||'[]').filter(t=>Date.now()-t<3600e3)}catch(e){return[]}}
   async function sendOrder(){
     const s=shop(),t=totals(),msg=$('orderMsg'),btn=$('sendOrder');
     const v=k=>$(k).value.trim();
+    const bad=(m)=>{msg.textContent=m;msg.className='note wide down'};
     const missing=FORM_FIELDS.filter(k=>k!=='o_addr2'&&!v(k));
-    if(missing.length){msg.textContent='Fill in every field except apartment.';msg.className='note wide down';$(missing[0]).focus();return}
+    if(missing.length){bad('Fill in every field except apartment.');$(missing[0]).focus();return}
     if(!t.lines.length){openCart();return}
-    const recent=recentOrders(); if(recent.length>=3){msg.textContent='Too many orders from this browser in the last hour. DM us on Discord instead.';msg.className='note wide down';return}
     const app=(document.querySelector('input[name=o_app]:checked')||{}).value||'Venmo';
-    const id='LV-'+Date.now().toString(36).slice(-5).toUpperCase();
-    const clip=(x,n)=>x.length>n?x.slice(0,n-1)+'…':x;
-    const items=clip(t.lines.map(x=>`• ${x.c.name} (${x.c.set} #${x.c.number}) · ${x.c.cond}${x.q>1?' ×'+x.q:''} — ${money(askOf(x.c)*x.q)}`).join('\n'),1000);
-    const addr=[v('o_name'),v('o_addr1'),v('o_addr2'),`${v('o_city')}, ${v('o_state')} ${v('o_zip')}`].filter(Boolean).join('\n');
-    const payload={username:'Vault Orders',allowed_mentions:{parse:[]},
-      content:`🛒 **New order ${id}** — ${money(t.total)} via ${app} (check for payment before shipping)`,
-      embeds:[{title:`Order ${id}`,color:0x5b3df5,timestamp:new Date().toISOString(),fields:[
-        {name:`Cards (${t.units})`,value:items||'—'},
-        {name:'Subtotal',value:money(t.sub),inline:true},
-        {name:'Discount',value:t.disc?`−${money(t.disc)} (${t.rate}%)`:'none',inline:true},
-        {name:'Shipping',value:t.ship?money(t.ship):'FREE',inline:true},
-        {name:'TOTAL',value:`**${money(t.total)}**`,inline:true},
-        {name:'Paying with',value:clip(`${app} · from "${v('o_paidname')}"`,200),inline:true},
-        {name:'Ship to',value:clip(addr,500)},
-        {name:'Contact',value:clip(v('o_contact'),200)}]}]};
+    const items={}; t.lines.forEach(x=>items[x.c.id]=x.q);
+    const body={items,app,name:v('o_name'),addr1:v('o_addr1'),addr2:v('o_addr2'),city:v('o_city'),state:v('o_state'),zip:v('o_zip'),paidName:v('o_paidname'),contact:v('o_contact')};
     btn.disabled=true; btn.textContent='Sending…';
+    let r,j={};
+    try{ r=await fetch(s.orderApi+'/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); j=await r.json().catch(()=>({})); }
+    catch(err){btn.disabled=false;btn.textContent='Try again';bad('Could not reach the shop (check your connection). Your cart is saved.');return}
+    if(r.status===409&&j.items){
+      j.items.forEach(x=>{const c=byId[x.id];if(!c)return; if(x.left<=0){delete cart[x.id];c.sold=true}else{cart[x.id]=x.left;c.qty=x.left}});
+      cartNotice=`Sorry, someone just grabbed ${j.items.map(x=>x.name).join(', ')}. Your cart is updated; check the new total and send again.`;
+      saveCart();updateCartBtn();render();openCart();
+      return;
+    }
+    if(r.status===429){btn.disabled=false;btn.textContent='Send order';bad('Too many orders from your connection in the last hour. DM us on Discord instead.');return}
+    if(!r.ok||!j.ok){btn.disabled=false;btn.textContent='Try again';bad('The shop could not take the order right now. Your cart is saved; try again in a minute or DM us on Discord.');return}
+    t.lines.forEach(x=>{const c=byId[x.c.id];if(!c)return;c.qty=(c.qty||1)-x.q;if(c.qty<=0){c.qty=0;c.sold=true}});
+    cart={}; saveCart(); updateCartBtn(); render(); renderMeta();
+    showPlaced({id:j.id,app:j.app,total:j.total,units:j.units,ship:j.ship});
+  }
+  // live holds: cards in orders that haven't been marked sold on the Owner desk yet
+  async function loadHolds(){
+    const s=shop(); if(!window.VAULT_DATA||!s.orderApi) return;
     try{
-      const fd=new FormData(); fd.append('payload_json',JSON.stringify(payload));
-      await fetch(s.orderHook,{method:'POST',body:fd,mode:'no-cors'});
-    }catch(err){btn.disabled=false;btn.textContent='Try again';msg.textContent='Could not send the order (check your connection). Your cart is saved.';msg.className='note wide down';return}
-    try{recent.push(Date.now());localStorage.setItem('vault-sent',JSON.stringify(recent))}catch(e){}
-    const placed={id,app,total:t.total,units:t.units,ship:t.ship};
-    cart={}; saveCart(); updateCartBtn(); render(); showPlaced(placed);
+      const r=await fetch(s.orderApi+'/holds'); if(!r.ok) return; const j=await r.json(); const held=j.held||{};
+      Object.entries(held).forEach(([id,q])=>{const c=byId[id];if(!c||c._held===q)return;const base=c._baseQty??(c.qty||1);c._baseQty=base;c._held=q;c.qty=Math.max(0,base-q);if(c.qty===0)c.sold=true});
+      const gone=[];Object.keys(cart).forEach(id=>{const c=byId[id];if(!c||c.sold){if(c)gone.push(c.name);delete cart[id]}else if(cart[id]>c.qty){gone.push(c.name);cart[id]=c.qty}});
+      if(gone.length)cartNotice=`Heads up: someone just ordered ${gone.join(', ')}, so ${gone.length>1?'they were':'it was'} taken out of your cart.`;
+      saveCart(); updateCartBtn(); render(); renderMeta(); if(view==='cart')openCart();
+    }catch(e){}
   }
   function showPlaced(o){
     view='placed'; const s=shop();
@@ -654,7 +660,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     if(window.VAULT_DATA){ // static export: data baked in, no owner tools
       const D=window.VAULT_DATA; meta=D.meta||null;
       cards=Object.entries(D.cards).map(([id,d])=>({id:Number(id),...d})); byId={}; cards.forEach(c=>byId[c.id]=c);
-      rebuildFilters(); renderMeta(); render(); updateCartBtn(); return;
+      rebuildFilters(); renderMeta(); render(); updateCartBtn(); loadHolds(); setInterval(loadHolds,60000); return;
     }
     db=await claude.use('db');
     if(!db){$('grid').innerHTML='<div class="empty">Sign in to view the vault inventory.</div>';return}

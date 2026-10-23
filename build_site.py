@@ -7,11 +7,17 @@ for f in glob.glob('export/cards/*.json'):
     cards[os.path.splitext(os.path.basename(f))[0]]=json.load(open(f))
 meta=json.load(open('export/meta/site.json')) if os.path.exists('export/meta/site.json') else {}
 meta['updated']=datetime.date.today().isoformat()
+meta.pop('orderHook',None)  # never publish a raw Discord webhook
+applied=[]
+if os.path.exists('export/meta/orders.json'):
+    applied=json.load(open('export/meta/orders.json')).get('applied',[])
 page=open(SRC).read()
 # strip the artifact-only meta tag
 page=page.replace('<meta name="claude:viewport-fit-sides" content="cover">\n','')
 title_m=re.search(r'<title>(.*?)</title>',page)
 data=json.dumps({'cards':cards,'meta':meta},separators=(',',':'))
+# data.json is what the order relay reads to check stock and prices
+json.dump({'cards':cards,'meta':meta,'appliedOrders':applied,'builtAt':datetime.datetime.now(datetime.timezone.utc).isoformat()},open(f'{OUT}/data.json','w'),separators=(',',':'))
 html=('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
       f'<meta name="description" content="{title_m.group(1)} — Pokémon singles for sale, priced to condition, Venmo + tracked shipping.">'
       '<link rel="icon" href="favicon.svg">'
