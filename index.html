@@ -198,7 +198,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       <div>
         <div class="eyebrow"><i></i> Live binder · priced daily</div>
         <h1>Lazy Lucario <span>Vault</span></h1>
-        <div class="tag">Pokémon singles straight from the stream binder, graded to condition and priced off TCGplayer market. Pay on Venmo, shipped tracked in a bubble mailer.</div>
+        <div class="tag">Pokémon singles straight from the stream binder, graded to condition and priced off TCGplayer market. Bundle for up to 10% off, pay with Venmo or Cash App, shipped tracked.</div>
         <div class="hero-cta"><a class="btn primary" href="#binder" style="flex:0 0 auto">Browse the binder</a><a class="btn" id="discordHero" href="https://discord.gg/PWGYVXAUZP" target="_blank" rel="noopener" style="flex:0 0 auto">Join the Discord</a></div>
       </div>
       <div class="fan" id="fan" aria-label="Top pulls"></div>
@@ -207,7 +207,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   <div class="stats" id="stats">
     <div class="stat"><div class="l">Cards available</div><div class="v" id="stCount">—</div><div class="s" id="stUnique">loading inventory</div></div>
     <div class="stat"><div class="l">Sets represented</div><div class="v" id="stSets">—</div><div class="s">English + Japanese</div></div>
-    <div class="stat"><div class="l">Shipping</div><div class="v" id="stShip" style="font-size:19px">—</div><div class="s">flat, tracked bubble mailer</div></div>
+    <div class="stat"><div class="l">Shipping</div><div class="v" id="stShip" style="font-size:19px">—</div><div class="s" id="stShipNote">tracked bubble mailer</div></div>
     <div class="stat"><div class="l">Prices as of</div><div class="v" id="stDate" style="font-size:19px">—</div><div class="s">refreshed daily at 6:45 AM</div></div>
   </div>
   <nav class="tabs" role="tablist" id="tabs">
@@ -238,7 +238,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   </div>
   <div class="howto" id="howto">
     <b>How buying works</b>
-    <span class="step"><span class="n">1</span><b>Add cards</b> to your cart (2+ cards = <b id="bundleTxt">2.5% per card</b> off, free shipping at <b id="freeTxt">$150</b>)</span>
+    <span class="step"><span class="n">1</span><b>Add cards</b> to your cart: <b id="bundleTxt">2.5% off per card, up to 10%</b> · free shipping at <b id="freeTxt">$150 or 4+ cards</b></span>
     <span class="step"><span class="n">2</span>Pay the total on <b>Venmo</b> or <b>Cash App</b></span>
     <span class="step"><span class="n">3</span>DM the order note + address on Discord</span>
     <span class="step"><span class="n">4</span>Ships tracked within 2 business days</span>
@@ -277,7 +277,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   let cards=[], priv=null, meta=null, db=null, byId={};
   const rarityCls=r=>/(secret|hyper|special|mega|classic)/i.test(r)?'gold':/(ultra|illustration|art|double|super)/i.test(r)?'vio':/(holo|promo)/i.test(r)?'teal':'';
   const askOf=c=>(c.ask!=null&&c.ask!=='')?c.ask:c.price;
-  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5,bundleMax:(meta&&meta.bundleMax!=null)?meta.bundleMax:20});
+  const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5,bundleMax:(meta&&meta.bundleMax!=null)?meta.bundleMax:10});
 
   // ---- tabs (hash: #cards / #owner)
   function showTab(t){
@@ -364,8 +364,9 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     const rate=units>=2?Math.min(s.bundlePct*units,s.bundleMax):0;
     const disc=Math.round(sub*rate)/100;
     const after=sub-disc;
-    const ship=lines.length?(after>=s.freeShipAt?0:s.ship):0;
-    return {lines,sub,units,rate,disc,after,ship,total:after+ship};
+    const maxed=units>=2&&rate>=s.bundleMax;
+    const ship=lines.length?((after>=s.freeShipAt||maxed)?0:s.ship):0;
+    return {lines,sub,units,rate,disc,after,ship,maxed,total:after+ship};
   }
   function addToCart(id,q){const c=byId[id];if(!c)return;cart[id]=Math.min((cart[id]||0)+q,c.qty||1);saveCart();updateCartBtn()}
   function updateCartBtn(){const n=cartCount();$('cartBtn').hidden=false;$('cartN').textContent=n?String(n):'';$('cartBtn').classList.toggle('has',n>0)}
@@ -391,7 +392,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
           <div><span>Price${cur.ask!=null&&cur.price!=null?` <small class="why">(market ${money(cur.price)})</small>`:''}</span><span class="num">${money(ask)}</span></div>
           ${cur.qty>1?`<div><span>Quantity <small class="why">(${cur.qty} available)</small></span><span class="qty"><button id="qm" aria-label="Fewer">−</button><span class="num">${qty}</span><button id="qp" aria-label="More">+</button></span></div>`:''}
         </div>
-        <div class="perks"><span>🎁 ${s.bundlePct}% off per card when you buy 2+ (up to ${s.bundleMax}%)</span><span>📦 Free shipping at ${money(s.freeShipAt)}, else ${money(s.ship)} tracked</span><span>💸 Venmo or Cash App</span></div>
+        <div class="perks"><span>🎁 ${s.bundlePct}% off per card when you buy 2+ (up to ${s.bundleMax}%)</span><span>📦 Free shipping at ${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards, else ${money(s.ship)} tracked</span><span>💸 Venmo or Cash App</span></div>
         <div class="cta">
           <button class="btn primary" id="addCart">${inCart?`Add ${qty} more (${inCart} in cart)`:'Add to cart'}</button>
           <button class="btn" id="goCart">${cartCount()?`View cart (${cartCount()})`:'View cart'}</button>
@@ -424,9 +425,9 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <div class="lines">${t.lines.map(x=>`<div class="line"><div class="thumb">${picOf(x.c)}</div><div class="lmain"><div class="name">${esc(x.c.name)}</div><div class="set">${esc(x.c.set)} · #${esc(x.c.number)} · ${esc(x.c.cond)}</div></div><div class="lqty"><span class="qty"><button data-dec="${x.c.id}" aria-label="Fewer">−</button><span class="num">${x.q}</span><button data-inc="${x.c.id}" aria-label="More" ${x.q>=(x.c.qty||1)?'disabled':''}>+</button></span><span class="num lp">${money(askOf(x.c)*x.q)}</span><button class="rm" data-rm="${x.c.id}" aria-label="Remove">remove</button></div></div>`).join('')}</div>
         <div class="sum">
           <div><span>Subtotal <small class="why">(${t.units} card${t.units>1?'s':''})</small></span><span class="num">${money(t.sub)}</span></div>
-          ${t.disc?`<div class="up"><span>Bundle discount ${t.rate}% <small class="why">(${s.bundlePct}% per card${t.rate>=s.bundleMax?', max':''})</small></span><span class="num">−${money(t.disc)}</span></div>`:`<div class="why"><span>Add a 2nd card for ${s.bundlePct*2}% off everything (${s.bundlePct}% per card, up to ${s.bundleMax}%)</span><span></span></div>`}
+          ${t.disc?`<div class="up"><span>Bundle discount ${t.rate}% <small class="why">(${s.bundlePct}% per card${t.maxed?', max + free shipping':''})</small></span><span class="num">−${money(t.disc)}</span></div>`:`<div class="why"><span>Add a 2nd card for ${s.bundlePct*2}% off everything (${s.bundlePct}% per card, up to ${s.bundleMax}%)</span><span></span></div>`}
           <div><span>Shipping${t.ship?' (tracked)':''}</span><span class="num ${t.ship?'':'up'}">${t.ship?money(t.ship):'FREE'}</span></div>
-          ${t.ship&&toFree>0?`<div class="why"><span>${money(toFree)} more for free shipping</span><span></span></div>`:''}
+          ${t.ship?`<div class="why"><span>Free shipping at ${money(s.freeShipAt)}${toFree>0?` (${money(toFree)} more)`:''} or with ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards</span><span></span></div>`:''}
           <div><span>Total</span><span class="num">${money(t.total)}</span></div>
         </div>
         <ol class="steps">
@@ -524,13 +525,13 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     $('stCount').textContent=avail.reduce((n,c)=>n+c.qty,0)||'—';
     $('stUnique').textContent=cards.length?`${avail.length} listings${cards.length-avail.length?`, ${cards.length-avail.length} sold`:''}`:'nothing synced yet';
     $('stSets').textContent=new Set(cards.map(c=>c.set)).size||'—';
-    $('stShip').textContent=money(shop().ship);
+    $('stShip').textContent=money(shop().ship); $('stShipNote').textContent=`tracked · free at ${money(shop().freeShipAt)} or ${Math.ceil(shop().bundleMax/shop().bundlePct)}+ cards`;
     const d=(priv&&priv.report&&priv.report.generated_at)||(meta&&meta.updated);
     $('stDate').textContent=d?new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—';
     $('footNote').textContent=meta?`Last sync ${meta.updated}`:'';
     const s=shop();
-    const dh=$('discordHero'); if(dh) dh.href=s.discord; $('bundleTxt').textContent=s.bundlePct+'% per card'; $('freeTxt').textContent=money(s.freeShipAt);
-    $('shopSettings').innerHTML=`Venmo <b>@${esc(s.venmo)}</b> · Cash App <b>$${esc(s.cashapp)}</b> · Bundle <b>${s.bundlePct}% per card</b> off 2+ cards (max ${s.bundleMax}%) · Free shipping at <b>${money(s.freeShipAt)}</b> · Discord <a href="${esc(s.discord)}" target="_blank" rel="noopener">${esc(s.discord.replace('https://',''))}</a> · Shipping <b>${money(s.ship)}</b> flat`;
+    const dh=$('discordHero'); if(dh) dh.href=s.discord; $('bundleTxt').textContent=`${s.bundlePct}% off per card, up to ${s.bundleMax}%`; $('freeTxt').textContent=`${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards`;
+    $('shopSettings').innerHTML=`Venmo <b>@${esc(s.venmo)}</b> · Cash App <b>$${esc(s.cashapp)}</b> · Bundle <b>${s.bundlePct}% per card</b> off 2+ cards (max ${s.bundleMax}%, free shipping at the max) · Free shipping at <b>${money(s.freeShipAt)}</b> · Discord <a href="${esc(s.discord)}" target="_blank" rel="noopener">${esc(s.discord.replace('https://',''))}</a> · Shipping <b>${money(s.ship)}</b> flat`;
   }
 
   // ---- owner desk
