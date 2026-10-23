@@ -145,6 +145,11 @@ nav.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);borde
 .form label.radio:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 .form .btn.wide{grid-column:1/-1;padding:12px}
 .note.down{color:var(--down)}
+.offerbox{display:grid;gap:8px;margin-top:12px;padding:12px;border:1px dashed var(--line);border-radius:12px}
+.offerbox.ok{border-style:solid;border-color:var(--up);background:color-mix(in srgb,var(--up) 8%,var(--surface))}
+.offerbox .why{font-size:12.5px;color:var(--muted)}
+.offerbox .form{margin-top:0}
+.offerbox .rm{justify-self:start}
 .sum div.why{font-size:12px;padding-block:5px}
 @media (max-width:420px){.cta.pay{grid-template-columns:1fr}}
 .btn.ghost{flex:0 0 auto;color:var(--muted)}
@@ -332,7 +337,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       return `<article class="card${holo?' holo':''}${c.sold?' sold':''}" data-id="${c.id}">
         <div class="pic" data-open="${c.id}">${picOf(c)}${ask!=null&&!c.sold?`<div class="tagprice">${money(ask)}${c.ask!=null&&c.price!=null?`<small>mkt ${money(c.price)}</small>`:''}</div>`:''}${c.sold?'<div class="stamp">SOLD</div>':''}</div>
         <div><div class="name">${esc(c.name)}</div><div class="set">${esc(c.set)}${c.number?' · #'+esc(c.number):''}</div></div>
-        ${c.notes?`<div class="set" style="font-style:italic">${esc(c.notes)}</div>`:''}<div class="badges"><span class="b cond">${esc(c.cond)}</span>${c.printing?`<span class="b">${esc(c.printing.replace(' - Japanese',''))}</span>`:''}${c.language==='Japanese'?'<span class="b jp">JP</span>':''}${c.rarity&&c.rarity!=='None'?`<span class="b ${rarityCls(c.rarity)}">${esc(c.rarity)}</span>`:''}${c.qty>1?`<span class="b">×${c.qty}</span>`:''}</div>
+        ${c.notes?`<div class="set" style="font-style:italic">${esc(c.notes)}</div>`:''}<div class="badges"><span class="b cond">${esc(c.cond)}</span>${c.printing?`<span class="b">${esc(c.printing.replace(' - Japanese',''))}</span>`:''}${c.language==='Japanese'?'<span class="b jp">JP</span>':''}${c.rarity&&c.rarity!=='None'?`<span class="b ${rarityCls(c.rarity)}">${esc(c.rarity)}</span>`:''}${c.qty>1?`<span class="b">×${c.qty}</span>`:''}${myOffers[c.id]&&['pending','accepted'].includes(myOffers[c.id].status)?`<span class="b ${myOffers[c.id].status==='accepted'?'teal':'gold'}">${myOffers[c.id].status==='accepted'?'Offer accepted':'Offer pending'} ${money(myOffers[c.id].amount)}</span>`:''}</div>
         <div class="price" data-pricebox="${c.id}"><span class="p">${ask==null?'<span class="warn" style="font-size:13px">ask for price</span>':money(ask)}</span><span class="chg ${cls(c.chg7)}">${c.chg7==null?'':pct(c.chg7)+' 7d'}</span></div>
         ${priv?`<div class="own"><span>paid ${money(cost)}</span><span class="${cls(pnl)}">${signed(pnl)}</span></div>`:''}
         <div class="actions">${canBuy?`<button class="btn primary" data-add="${c.id}">${cart[c.id]?'In cart ✓':'Add to cart'}</button>`:`<button class="btn" disabled>${c.sold?'Sold':'Message for price'}</button>`}${priv?`<button class="btn ghost" data-edit="${c.id}">Edit</button><button class="btn ghost" data-sold="${c.id}">${c.sold?'Relist':'Mark sold'}</button>`:''}</div>
@@ -363,15 +368,18 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   let cartNotice='';
   let cart={}; // id -> qty
   try{cart=JSON.parse(localStorage.getItem('vault-cart')||'{}')||{}}catch(e){cart={}}
-  function saveCart(){try{localStorage.setItem('vault-cart',JSON.stringify(cart))}catch(e){}}
-  function cartLines(){return Object.entries(cart).map(([id,q])=>({c:byId[id],q})).filter(x=>x.c&&!x.c.sold&&askOf(x.c)!=null).map(x=>({...x,q:Math.min(x.q,x.c.qty||1)}))}
+  function saveCart(){Object.keys(cartOffers).forEach(id=>{if(!cart[id])delete cartOffers[id]});try{localStorage.setItem('vault-cart',JSON.stringify(cart));localStorage.setItem('vault-cart-offers',JSON.stringify(cartOffers))}catch(e){}}
+  let cartOffers={}; try{cartOffers=JSON.parse(localStorage.getItem('vault-cart-offers')||'{}')||{}}catch(e){cartOffers={}}
+  function offerFor(id){const o=myOffers[id];return o&&o.status==='accepted'&&cartOffers[id]===o.id?o:null}
+  function cartLines(){return Object.entries(cart).map(([id,q])=>({c:byId[id],q})).filter(x=>x.c&&!x.c.sold&&askOf(x.c)!=null).map(x=>{const o=offerFor(x.c.id);return {...x,q:o?1:Math.min(x.q,x.c.qty||1),price:o?o.amount:askOf(x.c),offer:o?o.id:null}})}
   function cartCount(){return cartLines().reduce((n,x)=>n+x.q,0)}
   function totals(){
     const s=shop(),lines=cartLines();
-    const sub=lines.reduce((n,x)=>n+askOf(x.c)*x.q,0);
+    const sub=lines.reduce((n,x)=>n+x.price*x.q,0);
     const units=lines.reduce((n,x)=>n+x.q,0);
     const rate=units>=2?Math.min(s.bundlePct*units,s.bundleMax):0;
-    const disc=Math.round(sub*rate)/100;
+    const listSub=lines.filter(x=>!x.offer).reduce((n,x)=>n+x.price*x.q,0);
+    const disc=Math.round(listSub*rate)/100;
     const after=sub-disc;
     const maxed=units>=2&&rate>=s.bundleMax;
     const ship=lines.length?((after>=s.freeShipAt||maxed)?0:s.ship):0;
@@ -380,6 +388,58 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   function addToCart(id,q){const c=byId[id];if(!c)return;cart[id]=Math.min((cart[id]||0)+q,c.qty||1);saveCart();updateCartBtn()}
   function updateCartBtn(){const n=cartCount();$('cartBtn').hidden=false;$('cartN').textContent=n?String(n):'';$('cartBtn').classList.toggle('has',n>0)}
   $('cartBtn').addEventListener('click',()=>{openCart();if(typeof loadHolds==='function')loadHolds()});
+
+  // ---- offers (buyer side; Lazy accepts/declines from Discord)
+  let myOffers={}; try{myOffers=JSON.parse(localStorage.getItem('vault-offers')||'{}')||{}}catch(e){myOffers={}}
+  function saveOffers(){try{localStorage.setItem('vault-offers',JSON.stringify(myOffers))}catch(e){}}
+  const OFFER_LABEL={pending:'Offer pending',accepted:'Offer accepted',declined:'Offer declined',expired:'Offer expired',used:'Offer used'};
+  function offerFloor(c){return Math.ceil(askOf(c)*90)/100}
+  async function refreshOffers(){
+    const s=shop(); if(!canSend())return; let changed=false;
+    for(const [cid,o] of Object.entries(myOffers)){
+      if(!['pending','accepted'].includes(o.status))continue;
+      try{const r=await fetch(`${s.orderApi}/offer/${o.id}`);if(r.status===404){o.status='expired';changed=true;continue}const j=await r.json();if(j.offer&&j.offer.status!==o.status){Object.assign(o,j.offer);changed=true}}catch(e){}
+    }
+    if(changed){saveOffers();render();if(view==='card'&&cur)drawBuy();if(view==='cart')openCart()}
+  }
+  function offerBlock(c){
+    if(!canSend()||c.sold||askOf(c)==null) return '';
+    const o=myOffers[c.id];
+    if(o&&o.status==='pending') return `<div class="offerbox"><b>Your offer of ${money(o.amount)} is pending.</b><span class="why">You'll see the answer right here, usually within a day. Offers expire after 3 days.</span><button class="rm" id="offerWithdraw">forget this offer</button></div>`;
+    if(o&&o.status==='accepted'){const inC=cartOffers[c.id]===o.id;return `<div class="offerbox ok"><b>Offer accepted: ${money(o.amount)}</b><span class="why">Check out by ${new Date(o.checkoutBy).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'})} to lock it in.</span><button class="btn primary" id="offerAdd" ${inC?'disabled':''}>${inC?'In your cart at the offer price':`Add to cart at ${money(o.amount)}`}</button></div>`}
+    const note=o?`<span class="why">${OFFER_LABEL[o.status]||''}${o.status==='declined'?'. You can still buy at the list price or try another offer.':''}</span>`:'';
+    const contact=(()=>{try{return (JSON.parse(localStorage.getItem('vault-ship')||'{}').o_contact)||''}catch(e){return ''}})();
+    return `<div class="offerbox">${note}<button class="btn" id="offerToggle" type="button">Make an offer</button>
+      <form class="form" id="offerForm" hidden novalidate>
+        <label>Your offer (lowest ${money(offerFloor(c))})<input id="of_amt" type="number" inputmode="decimal" step="0.01" min="${offerFloor(c)}" max="${(askOf(c)-0.01).toFixed(2)}" placeholder="${offerFloor(c).toFixed(2)}"></label>
+        <label>Discord username or email<input id="of_contact" maxlength="100" value="${esc(contact)}"></label>
+        <button class="btn primary wide" id="offerSend" type="submit">Send offer</button>
+        <p class="note wide" id="offerMsg">Offers can be up to 10% under the list price of ${money(askOf(c))}. The card isn't held while you wait, so someone can still buy it at full price.</p>
+      </form></div>`;
+  }
+  function wireOffer(c){
+    const t=$('offerToggle'); if(t)t.onclick=()=>{$('offerForm').hidden=false;t.hidden=true;$('of_amt').focus()};
+    const w=$('offerWithdraw'); if(w)w.onclick=()=>{delete myOffers[c.id];saveOffers();render();drawBuy()};
+    const a=$('offerAdd'); if(a)a.onclick=()=>{const o=myOffers[c.id];cart[c.id]=1;cartOffers[c.id]=o.id;saveCart();updateCartBtn();render();openCart()};
+    const f=$('offerForm'); if(!f)return;
+    f.addEventListener('submit',async e=>{
+      e.preventDefault(); const msg=$('offerMsg'),btn=$('offerSend'),s=shop();
+      const amt=Math.round(parseFloat($('of_amt').value)*100)/100, contact=$('of_contact').value.trim(), ask=askOf(c), floor=offerFloor(c);
+      const bad=m=>{msg.textContent=m;msg.className='note wide down'};
+      if(!(amt>0))return bad('Enter an amount.');
+      if(amt<floor)return bad(`The lowest offer for this card is ${money(floor)}.`);
+      if(amt>=ask)return bad(`That's not below the list price of ${money(ask)}. Just add it to your cart.`);
+      if(!contact)return bad('Add your Discord username or email so we can reach you.');
+      btn.disabled=true;btn.textContent='Sending…';
+      try{
+        const r=await fetch(s.orderApi+'/offer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cardId:String(c.id),amount:amt,contact})});
+        const j=await r.json().catch(()=>({}));
+        if(r.ok&&j.offer){myOffers[c.id]=j.offer;saveOffers();render();drawBuy();return}
+        btn.disabled=false;btn.textContent='Send offer';
+        bad(j.error==='too_low'?`The lowest offer for this card is ${money(j.floor)}.`:j.error==='unavailable'?'Sorry, this card just sold.':j.error==='rate_limited'?'Too many offers from your connection in the last hour. Try again later.':'Could not send the offer right now. Try again in a minute.');
+      }catch(err){btn.disabled=false;btn.textContent='Send offer';bad('Could not reach the shop. Check your connection.')}
+    });
+  }
 
   // ---- card sheet (details + add to cart)
   let cur=null, qty=1;
@@ -401,23 +461,25 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
           <div><span>Price${cur.ask!=null&&cur.price!=null?` <small class="why">(market ${money(cur.price)})</small>`:''}</span><span class="num">${money(ask)}</span></div>
           ${cur.qty>1?`<div><span>Quantity <small class="why">(${cur.qty} available)</small></span><span class="qty"><button id="qm" aria-label="Fewer">−</button><span class="num">${qty}</span><button id="qp" aria-label="More">+</button></span></div>`:''}
         </div>
-        <div class="perks"><span>🎁 ${s.bundlePct}% off per card when you buy 2+ (up to ${s.bundleMax}%)</span><span>📦 Free shipping at ${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards, else ${money(s.ship)} tracked</span><span>💸 Venmo or Cash App</span></div>
+        <div class="perks"><span>🎁 ${s.bundlePct}% off per card when you buy 2+ (up to ${s.bundleMax}%)</span><span>📦 Free shipping at ${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards, else ${money(s.ship)} tracked</span><span>💸 Venmo or Cash App</span>${canSend()?'<span>🤝 Offers up to 10% under list</span>':''}</div>
         <div class="cta">
           <button class="btn primary" id="addCart">${inCart?`Add ${qty} more (${inCart} in cart)`:'Add to cart'}</button>
           <button class="btn" id="goCart">${cartCount()?`View cart (${cartCount()})`:'View cart'}</button>
-        </div>`}
+        </div>
+        ${offerBlock(cur)}`}
       </div></div>`;
     $('closeBuy').onclick=closeBuy;
     const qm=$('qm'),qp=$('qp');
     if(qm){qm.onclick=()=>{if(qty>1){qty--;drawBuy()}};qp.onclick=()=>{if(qty<cur.qty){qty++;drawBuy()}}}
-    const ac=$('addCart'); if(ac)ac.onclick=()=>{addToCart(cur.id,qty);openCart()};
+    const ac=$('addCart'); if(ac)ac.onclick=()=>{delete cartOffers[cur.id];addToCart(cur.id,qty);openCart()};
     const gc=$('goCart'); if(gc)gc.onclick=openCart;
+    wireOffer(cur);
   }
 
   // ---- cart / checkout sheet
   function orderNote(){
     const s=shop(),t=totals();
-    const items=t.lines.map(x=>`• ${x.c.name} (${x.c.set} #${x.c.number}) · ${x.c.cond}${x.q>1?` ×${x.q}`:''} — ${money(askOf(x.c)*x.q)}`).join('\n');
+    const items=t.lines.map(x=>`• ${x.c.name} (${x.c.set} #${x.c.number}) · ${x.c.cond}${x.q>1?` ×${x.q}`:''} — ${money(x.price*x.q)}${x.offer?' (accepted offer)':''}`).join('\n');
     return `ORDER — Lazy Lucario Vault\n${items}\nSubtotal: ${money(t.sub)}${t.disc?`\nBundle discount (${t.rate}%): −${money(t.disc)}`:''}\nShipping: ${t.ship?money(t.ship)+' tracked':'FREE'}\nTOTAL: ${money(t.total)}\nPaid with (Venmo / Cash App) and name I paid from: \n\nSHIP TO:\nName: \nAddress: \nCity, State ZIP: `;
   }
   function openCart(){
@@ -432,10 +494,10 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <h2>Your cart</h2>
         ${cartNotice?`<p class="note down" style="margin-top:8px">${esc(cartNotice)}</p>`:''}
         ${!t.lines.length?`<p class="note" style="margin-top:12px">Nothing in here yet. Tap a card and add it.</p>`:`
-        <div class="lines">${t.lines.map(x=>`<div class="line"><div class="thumb">${picOf(x.c)}</div><div class="lmain"><div class="name">${esc(x.c.name)}</div><div class="set">${esc(x.c.set)} · #${esc(x.c.number)} · ${esc(x.c.cond)}</div></div><div class="lqty"><span class="qty"><button data-dec="${x.c.id}" aria-label="Fewer">−</button><span class="num">${x.q}</span><button data-inc="${x.c.id}" aria-label="More" ${x.q>=(x.c.qty||1)?'disabled':''}>+</button></span><span class="num lp">${money(askOf(x.c)*x.q)}</span><button class="rm" data-rm="${x.c.id}" aria-label="Remove">remove</button></div></div>`).join('')}</div>
+        <div class="lines">${t.lines.map(x=>`<div class="line"><div class="thumb">${picOf(x.c)}</div><div class="lmain"><div class="name">${esc(x.c.name)}</div><div class="set">${esc(x.c.set)} · #${esc(x.c.number)} · ${esc(x.c.cond)}</div></div><div class="lqty"><span class="qty"><button data-dec="${x.c.id}" aria-label="Fewer">−</button><span class="num">${x.q}</span><button data-inc="${x.c.id}" aria-label="More" ${x.offer||x.q>=(x.c.qty||1)?'disabled':''}>+</button></span><span class="num lp">${money(x.price*x.q)}</span>${x.offer?'<span class="b up" style="background:transparent">offer</span>':''}<button class="rm" data-rm="${x.c.id}" aria-label="Remove">remove</button></div></div>`).join('')}</div>
         <div class="sum">
           <div><span>Subtotal <small class="why">(${t.units} card${t.units>1?'s':''})</small></span><span class="num">${money(t.sub)}</span></div>
-          ${t.disc?`<div class="up"><span>Bundle discount ${t.rate}% <small class="why">(${s.bundlePct}% per card${t.maxed?', max + free shipping':''})</small></span><span class="num">−${money(t.disc)}</span></div>`:`<div class="why"><span>Add a 2nd card for ${s.bundlePct*2}% off everything (${s.bundlePct}% per card, up to ${s.bundleMax}%)</span><span></span></div>`}
+          ${t.disc?`<div class="up"><span>Bundle discount ${t.rate}%${t.lines.some(x=>x.offer)?' (not on offer prices)':''} <small class="why">(${s.bundlePct}% per card${t.maxed?', max + free shipping':''})</small></span><span class="num">−${money(t.disc)}</span></div>`:`<div class="why"><span>Add a 2nd card for ${s.bundlePct*2}% off everything (${s.bundlePct}% per card, up to ${s.bundleMax}%)</span><span></span></div>`}
           <div><span>Shipping${t.ship?' (tracked)':''}</span><span class="num ${t.ship?'':'up'}">${t.ship?money(t.ship):'FREE'}</span></div>
           ${t.ship?`<div class="why"><span>Free shipping at ${money(s.freeShipAt)}${toFree>0?` (${money(toFree)} more)`:''} or with ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards</span><span></span></div>`:''}
           <div><span>Total</span><span class="num">${money(t.total)}</span></div>
@@ -493,8 +555,8 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     if(missing.length){bad('Fill in every field except apartment.');$(missing[0]).focus();return}
     if(!t.lines.length){openCart();return}
     const app=(document.querySelector('input[name=o_app]:checked')||{}).value||'Venmo';
-    const items={}; t.lines.forEach(x=>items[x.c.id]=x.q);
-    const body={items,app,name:v('o_name'),addr1:v('o_addr1'),addr2:v('o_addr2'),city:v('o_city'),state:v('o_state'),zip:v('o_zip'),paidName:v('o_paidname'),contact:v('o_contact')};
+    const items={},offers={}; t.lines.forEach(x=>{items[x.c.id]=x.q;if(x.offer)offers[x.c.id]=x.offer});
+    const body={items,offers,app,name:v('o_name'),addr1:v('o_addr1'),addr2:v('o_addr2'),city:v('o_city'),state:v('o_state'),zip:v('o_zip'),paidName:v('o_paidname'),contact:v('o_contact')};
     btn.disabled=true; btn.textContent='Sending…';
     let r,j={};
     try{ r=await fetch(s.orderApi+'/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); j=await r.json().catch(()=>({})); }
@@ -505,10 +567,15 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       saveCart();updateCartBtn();render();openCart();
       return;
     }
+    if(r.status===409&&j.error==='offer_invalid'){
+      const c=byId[j.cardId]; delete cartOffers[j.cardId]; if(myOffers[j.cardId])myOffers[j.cardId].status=j.status; saveOffers(); saveCart(); updateCartBtn(); render();
+      cartNotice=`Your offer on ${c?c.name:'a card'} has ${j.status==='expired'?'expired':'changed'}, so it's back at the list price. Check the total and send again.`; openCart(); return;
+    }
     if(r.status===429){btn.disabled=false;btn.textContent='Send order';bad('Too many orders from your connection in the last hour. DM us on Discord instead.');return}
     if(!r.ok||!j.ok){btn.disabled=false;btn.textContent='Try again';bad('The shop could not take the order right now. Your cart is saved; try again in a minute or DM us on Discord.');return}
     t.lines.forEach(x=>{const c=byId[x.c.id];if(!c)return;c.qty=(c.qty||1)-x.q;if(c.qty<=0){c.qty=0;c.sold=true}});
-    cart={}; saveCart(); updateCartBtn(); render(); renderMeta();
+    Object.entries(offers).forEach(([cid])=>{if(myOffers[cid])myOffers[cid].status='used'}); saveOffers();
+    cart={}; cartOffers={}; saveCart(); updateCartBtn(); render(); renderMeta();
     showPlaced({id:j.id,app:j.app,total:j.total,units:j.units,ship:j.ship});
   }
   // live holds: cards in orders that haven't been marked sold on the Owner desk yet
@@ -660,7 +727,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     if(window.VAULT_DATA){ // static export: data baked in, no owner tools
       const D=window.VAULT_DATA; meta=D.meta||null;
       cards=Object.entries(D.cards).map(([id,d])=>({id:Number(id),...d})); byId={}; cards.forEach(c=>byId[c.id]=c);
-      rebuildFilters(); renderMeta(); render(); updateCartBtn(); loadHolds(); setInterval(loadHolds,60000); return;
+      rebuildFilters(); renderMeta(); render(); updateCartBtn(); loadHolds(); refreshOffers(); setInterval(()=>{loadHolds();refreshOffers()},60000); return;
     }
     db=await claude.use('db');
     if(!db){$('grid').innerHTML='<div class="empty">Sign in to view the vault inventory.</div>';return}
