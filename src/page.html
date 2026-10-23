@@ -82,6 +82,11 @@ nav.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);borde
 .bar input{flex:1 1 220px}
 .bar select{flex:0 1 auto;max-width:100%}
 .count{font-size:12.5px;color:var(--muted);margin-left:auto;white-space:nowrap;padding-right:4px}
+.filters{flex-basis:100%;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:8px;border-top:1px dashed var(--line)}
+#filtersBtn{flex:0 0 auto;display:inline-flex;gap:6px;align-items:center}
+#filtersBtn .caret{transition:transform .2s;display:inline-block}
+#filtersBtn[aria-expanded="true"] .caret{transform:rotate(180deg)}
+#fCount:not(:empty){background:var(--accent);color:var(--accent-fg);border-radius:999px;font-size:10.5px;padding:1px 7px}
 .howto{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);padding:12px 14px;border-radius:14px;margin-top:12px;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 12%,var(--surface)),var(--surface));border:1px solid var(--line);line-height:1.5}
 .howto b{color:var(--fg)}
 .howto .step{display:inline-flex;align-items:center;gap:7px}
@@ -196,6 +201,9 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
 <section id="viewCards"><a id="binder"></a>
   <div class="bar">
     <input id="q" type="search" placeholder="Search name, set, number…" aria-label="Search cards">
+    <button class="btn ghost" id="filtersBtn" aria-expanded="false" aria-controls="filters">Filters <span id="fCount"></span> <span class="caret" aria-hidden="true">▾</span></button>
+    <span class="count" id="count"></span>
+    <div class="filters" id="filters" hidden>
     <select id="fLang" aria-label="Language"><option value="">All languages</option></select>
     <select id="fSet" aria-label="Set"><option value="">All sets</option></select>
     <select id="fCond" aria-label="Condition"><option value="">Any condition</option></select>
@@ -207,7 +215,8 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       <option value="name">Name A → Z</option>
       <option value="new">Newest scans</option>
     </select>
-    <span class="count" id="count"></span>
+    <button class="btn ghost" id="clearFilters" type="button">Clear</button>
+    </div>
   </div>
   <div class="howto" id="howto">
     <b>How buying works</b>
@@ -262,6 +271,11 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
 
   // ---- filters
   ['q','fLang','fSet','fCond','fRar','sort'].forEach(id=>$(id).addEventListener('input',render));
+  const FILTER_IDS=['fLang','fSet','fCond','fRar'];
+  function setFilters(open){$('filters').hidden=!open;$('filtersBtn').setAttribute('aria-expanded',String(open));try{localStorage.setItem('vault-filters',open?'1':'0')}catch(e){}}
+  $('filtersBtn').addEventListener('click',()=>setFilters($('filters').hidden));
+  $('clearFilters').addEventListener('click',()=>{FILTER_IDS.forEach(id=>$(id).value='');$('q').value='';render()});
+  try{if(localStorage.getItem('vault-filters')==='1')setFilters(true)}catch(e){}
   function fillSelect(sel,values){
     const cur=sel.value; const first=sel.firstElementChild.outerHTML;
     sel.innerHTML=first+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
@@ -281,6 +295,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     const by={'price-desc':(a,b)=>(askOf(b)??-1)-(askOf(a)??-1),'price-asc':(a,b)=>(askOf(a)??1e9)-(askOf(b)??1e9),'chg-desc':(a,b)=>(b.chg7??-1e9)-(a.chg7??-1e9),'name':(a,b)=>a.name.localeCompare(b.name),'new':(a,b)=>(b.added||'').localeCompare(a.added||'')||b.id-a.id};
     list.sort((a,b)=>(!!a.sold-!!b.sold)||by[sort](a,b));
     $('count').textContent=cards.length?`${list.length} of ${cards.length} cards`:'';
+    const active=FILTER_IDS.filter(id=>$(id).value).length; $('fCount').textContent=active?String(active):'';
     if(!cards.length){$('grid').innerHTML='<div class="empty">The vault is empty right now. Scan cards into Card Vault and sync to fill this page.</div>';return}
     if(!list.length){$('grid').innerHTML='<div class="empty">No cards match those filters.</div>';return}
     $('grid').innerHTML=list.map(c=>{
