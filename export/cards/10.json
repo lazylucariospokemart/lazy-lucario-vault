@@ -1,5 +1,6 @@
 {
   "added": "2026-10-18",
+  "ask": 80,
   "chg7": -3.42,
   "cond": "NM",
   "img": "42433",
@@ -11,5 +12,6 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Holo Rare",
-  "set": "Base Set"
+  "set": "Base Set Shadowless",
+  "sold": false
 }
