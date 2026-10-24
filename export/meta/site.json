@@ -1,4 +1,11 @@
 {
+  "away": {
+    "end": "2026-11-01",
+    "message": "Sioux Falls Card Show",
+    "mode": "pause",
+    "on": true,
+    "start": "2026-10-31"
+  },
   "bundleMax": 10,
   "bundlePct": 2.5,
   "cashapp": "Finney1992",
@@ -6,6 +13,33 @@
   "discord": "https://discord.gg/PWGYVXAUZP",
   "freeShipAt": 150,
   "orderApi": "https://vault-orders.lazylucariospokemart28.workers.dev",
+  "packOz": 8,
+  "shipTiers": [
+    {
+      "price": 8,
+      "upTo": 16
+    },
+    {
+      "price": 12,
+      "upTo": 48
+    },
+    {
+      "price": 15,
+      "upTo": 80
+    },
+    {
+      "price": 22,
+      "upTo": 160
+    },
+    {
+      "price": 35,
+      "upTo": 320
+    },
+    {
+      "price": 45,
+      "upTo": null
+    }
+  ],
   "shipping": 5,
   "source": "Card Vault",
   "unique": 102,

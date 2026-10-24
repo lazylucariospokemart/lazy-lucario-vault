@@ -197,6 +197,69 @@ td.r,th.r{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 svg.spark{width:100%;height:120px;display:block}
 footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between}
 
+/* sealed + slabs */
+.kinds{display:flex;gap:6px;flex-wrap:wrap;flex-basis:100%;order:-1}
+.kinds button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-weight:800;font-size:12.5px;color:var(--muted)}
+.kinds button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:transparent}
+.kinds button small{font-weight:600;opacity:.75;margin-left:4px;font-family:var(--mono)}
+/* sealed: product on a lit shelf */
+.pic.shelf,.fan a.shelf,.line .thumb.shelf{background:radial-gradient(120% 75% at 50% 26%,#ffffff 0%,#f1f0f8 55%,#dcdae8 100%)} /* a light display stand in both themes, so white product shots blend in */
+.pic.shelf:has(img) .sealedph,.fan a.shelf:has(img) .sealedph,.line .thumb.shelf:has(img) .sealedph{display:none}
+.pic.shelf::before,.fan a.shelf::before{content:"";position:absolute;left:16%;right:16%;bottom:13%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.42),transparent);filter:blur(3px);pointer-events:none}
+.pic.shelf img,.fan a.shelf img,.line .thumb.shelf img{object-fit:contain;padding:16% 9% 20%;mix-blend-mode:multiply}
+.line .thumb.shelf img{padding:10%}
+.card:hover .pic.shelf img{transform:translateY(-4px) scale(1.03)}
+.pic.shelf .sealtag{background:rgba(255,255,255,.8);color:#17142e;border-color:rgba(23,20,46,.12)}
+.sealtag{position:absolute;left:8px;top:8px;z-index:1;font:800 9.5px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--glass);backdrop-filter:blur(6px);border:1px solid var(--line);color:var(--fg)}
+.sheet .pic.shelf .sealtag{font-size:10.5px}
+.line .thumb .sealtag,.fan a .sealtag{display:none}
+/* drawn packaging when there's no photo */
+.pkg{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);display:grid;place-items:center;text-align:center;color:#fff;overflow:hidden;filter:drop-shadow(0 12px 12px rgba(0,0,0,.3))}
+.pkg::before{content:"";position:absolute;inset:0;background:var(--foil);opacity:.55;mix-blend-mode:screen}
+.pkg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%)}
+.pkg .in{position:relative;z-index:1;display:grid;gap:5px;padding:0 8%;width:100%}
+.pkg .k{font:800 8.5px var(--display);letter-spacing:.14em;text-transform:uppercase;opacity:.9}
+.pkg .n{font:800 12px/1.15 var(--display);text-shadow:0 1px 3px rgba(0,0,0,.4);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pkg .band{height:3px;width:40%;margin:2px auto 0;border-radius:2px;background:rgba(255,255,255,.75)}
+.pkg.box{width:74%;aspect-ratio:1/.82;border-radius:6px;background:linear-gradient(160deg,var(--accent),var(--accent-2));box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),inset 0 -14px 0 rgba(0,0,0,.18)}
+.pkg.etb{width:66%;aspect-ratio:1/1.05;border-radius:6px;background:linear-gradient(160deg,var(--accent-2),var(--accent));box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),inset 0 18px 0 rgba(255,255,255,.14)}
+.pkg.pack{width:46%;aspect-ratio:1/1.75;border-radius:3px;background:linear-gradient(170deg,var(--accent),var(--accent-2));-webkit-mask:linear-gradient(#000 0 0) 0 6px/100% calc(100% - 12px) no-repeat,repeating-linear-gradient(90deg,#000 0 3px,transparent 3px 5px) 0 0/100% 6px repeat-x,repeating-linear-gradient(90deg,#000 0 3px,transparent 3px 5px) 0 100%/100% 6px repeat-x;mask:linear-gradient(#000 0 0) 0 6px/100% calc(100% - 12px) no-repeat,repeating-linear-gradient(90deg,#000 0 3px,transparent 3px 5px) 0 0/100% 6px repeat-x,repeating-linear-gradient(90deg,#000 0 3px,transparent 3px 5px) 0 100%/100% 6px repeat-x}
+.pkg.tin{width:62%;aspect-ratio:1/1.12;border-radius:16px;background:linear-gradient(160deg,#c9ccd6,#7d8294 55%,#b9bdc9);color:#17142e;box-shadow:inset 0 0 0 3px rgba(255,255,255,.45),inset 0 -10px 0 rgba(0,0,0,.12)}
+.pkg.tin .n{text-shadow:none}.pkg.tin .band{background:rgba(23,20,46,.5)}
+.pkg.blister{width:56%;aspect-ratio:1/1.4;border-radius:5px;background:linear-gradient(170deg,var(--accent),var(--accent-2));box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}
+.line .thumb .pkg .in,.xrow .thumb .pkg .in{display:none}
+@media (prefers-reduced-motion:reduce){.card:hover .pic.shelf img{transform:none}}
+.ph{position:absolute;inset:0;display:grid;place-items:center;padding:12px;text-align:center;background:linear-gradient(160deg,var(--surface-2),var(--bg-2))}
+.ph .ico{font-size:40px;line-height:1}
+.ph.sealedph{background:none;padding:0}
+.ph .t{font:700 11px var(--display);color:var(--muted);margin-top:8px;overflow-wrap:anywhere}
+.slabph{position:absolute;inset:7%;border-radius:8px;border:2px solid color-mix(in srgb,var(--fg) 25%,transparent);background:linear-gradient(170deg,color-mix(in srgb,#fff 70%,var(--surface-2)),var(--surface-2));display:grid;grid-template-rows:auto 1fr;overflow:hidden}
+.slabph .lab{background:var(--accent);color:var(--accent-fg);padding:8px 8px 7px;display:flex;justify-content:space-between;gap:6px;align-items:center;font:800 10.5px var(--display);letter-spacing:.04em}
+.slabph .lab b{font-size:20px;font-family:var(--mono)}
+.slabph .lab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.slabph .win{margin:8px;border-radius:5px;background:var(--foil);opacity:.55}
+.line .thumb .ph{padding:2px}.line .thumb .ph .t,.line .thumb .slabph .lab span{display:none}.line .thumb .ph .ico{font-size:20px}.line .thumb .slabph{inset:4%}.line .thumb .slabph .lab{padding:2px 4px}.line .thumb .slabph .lab b{font-size:11px}.line .thumb .slabtag{display:none}
+.slabtag{position:absolute;right:8px;top:8px;font:800 11px var(--display);background:var(--accent);color:var(--accent-fg);padding:4px 8px;border-radius:7px;letter-spacing:.03em}
+.b.kind{background:var(--fg);color:var(--bg)}
+.xrow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.xrow:last-child{border:0}
+.xrow .thumb{position:relative;width:44px;aspect-ratio:1;border-radius:6px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;font-size:20px}
+.xrow .thumb img{width:100%;height:100%;object-fit:contain}
+.xrow .nm{font-weight:700;font-size:13.5px}
+.xrow .r{text-align:right;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.seg{display:flex;gap:6px}
+.seg label.radio{flex:1 1 0}
+.prev{display:flex;gap:12px;align-items:center;margin-top:10px}
+.prev .pic{width:96px;flex:none;cursor:default}
+.photoRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.away{display:flex;gap:12px;align-items:flex-start;margin-top:12px;padding:14px 16px;border-radius:14px;border:1px solid color-mix(in srgb,var(--warn) 45%,var(--line));background:color-mix(in srgb,var(--warn) 12%,var(--surface));font-size:14px;line-height:1.5}
+.away .ico{font-size:22px;line-height:1.1}
+.away b{font-family:var(--display);font-size:14px}
+.away.soon{border-color:var(--line);background:var(--surface);font-size:13px;color:var(--muted)}
+.pill.awayp{background:var(--warn);color:var(--bg);border-color:transparent}
+.form .photoRow label.btn{display:inline-flex;align-items:center;text-transform:none;letter-spacing:0;font:800 13px var(--body);color:var(--fg)}
+.why.down{color:var(--down)}
+
 @media (max-width:760px){.hero-in{grid-template-columns:1fr;padding:22px 18px 20px}.fan{height:220px}.fan a{width:min(40%,140px)}}
 @media (max-width:560px){.sheet{grid-template-columns:1fr}.sheet .pic{max-width:200px;margin:0 auto}}
 @media (prefers-reduced-motion:no-preference){.card{transition:transform .18s,box-shadow .18s}.card:hover{transform:translateY(-3px);box-shadow:0 16px 34px -18px rgba(0,0,0,.45)}}
@@ -211,14 +274,14 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       <div>
         <div class="eyebrow"><i></i> Live binder · priced daily</div>
         <h1>Lazy Lucario <span>Vault</span></h1>
-        <div class="tag">Pokémon singles straight from the stream binder, graded to condition and priced off TCGplayer market. Bundle for up to 10% off, pay with Venmo or Cash App, shipped tracked.</div>
+        <div class="tag">Pokémon singles from the stream binder, plus sealed product and graded slabs, priced off TCGplayer market. Bundle for up to 10% off, pay with Venmo or Cash App, shipped tracked.</div>
         <div class="hero-cta"><a class="btn primary" href="#binder" style="flex:0 0 auto">Browse the binder</a><a class="btn" id="discordHero" href="https://discord.gg/PWGYVXAUZP" target="_blank" rel="noopener" style="flex:0 0 auto">Join the Discord</a></div>
       </div>
       <div class="fan" id="fan" aria-label="Top pulls"></div>
     </div>
   </div>
   <div class="stats" id="stats">
-    <div class="stat"><div class="l">Cards available</div><div class="v" id="stCount">—</div><div class="s" id="stUnique">loading inventory</div></div>
+    <div class="stat"><div class="l">Items available</div><div class="v" id="stCount">—</div><div class="s" id="stUnique">loading inventory</div></div>
     <div class="stat"><div class="l">Sets represented</div><div class="v" id="stSets">—</div><div class="s">English + Japanese</div></div>
     <div class="stat"><div class="l">Shipping</div><div class="v" id="stShip" style="font-size:19px">—</div><div class="s" id="stShipNote">tracked bubble mailer</div></div>
     <div class="stat"><div class="l">Prices as of</div><div class="v" id="stDate" style="font-size:19px">—</div><div class="s">refreshed daily at 6:45 AM</div></div>
@@ -231,7 +294,8 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
 
 <section id="viewCards"><a id="binder"></a>
   <div class="bar">
-    <input id="q" type="search" placeholder="Search name, set, number…" aria-label="Search cards">
+    <div class="kinds" id="kinds" role="group" aria-label="Show"><button type="button" data-kind="" aria-pressed="true">Everything</button><button type="button" data-kind="single" aria-pressed="false">Singles<small id="kn_single"></small></button><button type="button" data-kind="sealed" aria-pressed="false">Sealed<small id="kn_sealed"></small></button><button type="button" data-kind="slab" aria-pressed="false">Slabs<small id="kn_slab"></small></button></div>
+    <input id="q" type="search" placeholder="Search name, set, number, grade…" aria-label="Search the vault">
     <button class="btn ghost" id="filtersBtn" aria-expanded="false" aria-controls="filters">Filters <span id="fCount"></span> <span class="caret" aria-hidden="true">▾</span></button>
     <span class="count" id="count"></span>
     <div class="filters" id="filters" hidden>
@@ -249,12 +313,13 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     <button class="btn ghost" id="clearFilters" type="button">Clear</button>
     </div>
   </div>
+  <div class="away" id="awayBanner" hidden></div>
   <div class="howto" id="howto">
     <b>How buying works</b>
     <span class="step"><span class="n">1</span><b>Add cards</b> to your cart: <b id="bundleTxt">2.5% off per card, up to 10%</b> · free shipping at <b id="freeTxt">$150 or 4+ cards</b></span>
     <span class="step"><span class="n">2</span>Pay the total on <b>Venmo</b> or <b>Cash App</b></span>
     <span class="step"><span class="n">3</span><span id="step3">DM the order note + address on Discord</span></span>
-    <span class="step"><span class="n">4</span>Ships tracked within 2 business days</span>
+    <span class="step"><span class="n">4</span><span id="step4">Ships tracked within 2 business days</span></span>
   </div>
   <div class="grid" id="grid"><div class="empty">Opening the vault… cards appear here as soon as the inventory loads.</div></div>
 </section>
@@ -267,9 +332,11 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       <div class="panel"><h2>Movers <small>past 7 days</small></h2><div class="tbl"><table id="movers"></table></div></div>
     </div>
     <div class="panel"><h2>Sell suggestions <small>ranked by the agent's score</small></h2><div class="tbl"><table id="sells"></table></div></div>
+    <div class="panel" id="extrasPanel"><h2>Sealed &amp; slabs <span style="display:flex;gap:8px;align-items:baseline"><small id="extrasSum"></small><button class="btn primary" id="addExtra" style="flex:0 0 auto;padding:7px 12px;font-size:12.5px">+ Add sealed or slab</button></span></h2><div id="extrasList" class="note">Nothing added yet. Booster boxes, ETBs, packs, tins and graded slabs you add here show up in the binder under their own filter, with the same cart and checkout.</div></div>
     <div class="two">
       <div class="panel"><h2>Cleanup <small>cards the price refresh could not match</small></h2><div id="cleanup" class="note"></div></div>
-      <div class="panel"><h2>Shop settings</h2><div class="note" id="shopSettings"></div><p class="note" style="margin:8px 0 0"><b>Edit</b> on a card opens every listing field: name, set, number, rarity, language, printing, condition, quantity, your own price (buyers see it instead of market), a public note, sold status, or remove the listing from the site entirely. Marking a card <b>Sold</b> in the binder hides its Buy button for everyone until you relist it or the next Card Vault sync.</p></div>
+      <div class="panel" id="awayPanel"><h2>Away mode <small id="awayState"></small></h2><div id="awayBox"></div></div>
+      <div class="panel"><h2>Shop settings</h2><div class="note" id="shopSettings"></div><div id="shipRates"></div><p class="note" style="margin:8px 0 0"><b>Edit</b> on a card opens every listing field: name, set, number, rarity, language, printing, condition, quantity, your own price (buyers see it instead of market), a public note, sold status, or remove the listing from the site entirely. Marking a card <b>Sold</b> in the binder hides its Buy button for everyone until you relist it or the next Card Vault sync.</p></div>
     </div>
   </div>
 </section>
@@ -291,6 +358,94 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   const rarityCls=r=>/(secret|hyper|special|mega|classic)/i.test(r)?'gold':/(ultra|illustration|art|double|super)/i.test(r)?'vio':/(holo|promo)/i.test(r)?'teal':'';
   const askOf=c=>(c.ask!=null&&c.ask!=='')?c.ask:c.price;
   const shop=()=>({venmo:(meta&&meta.venmo)||'lazylucarios',cashapp:(meta&&meta.cashapp)||'Finney1992',discord:(meta&&meta.discord)||'https://discord.gg/PWGYVXAUZP',ship:(meta&&meta.shipping!=null)?meta.shipping:5,freeShipAt:(meta&&meta.freeShipAt!=null)?meta.freeShipAt:150,bundlePct:(meta&&meta.bundlePct!=null)?meta.bundlePct:2.5,bundleMax:(meta&&meta.bundleMax!=null)?meta.bundleMax:10,orderApi:((meta&&meta.orderApi)||'').replace(/\/$/,'')});
+
+  // ---- box shipping by weight (same math lives in the order relay; keep them identical)
+  const DEFAULT_TIERS=[{upTo:16,price:8},{upTo:48,price:12},{upTo:80,price:15},{upTo:160,price:22},{upTo:320,price:35},{upTo:null,price:45}];
+  const TYPE_OZ={'Booster Box':24,'Elite Trainer Box':22,'Booster Bundle':10,'Booster Pack':1,'Collection / Premium Box':32,'Tin':10,'Blister':4,'Build & Battle':10,'Booster Display (JP)':20,'Other':16};
+  const heavyOf=c=>!!c&&(c.kind==='sealed'||c.kind==='slab');
+  const ozOf=c=>{const w=Number(c&&c.wt);if(w>0)return w;if(c&&c.kind==='slab')return 4;return TYPE_OZ[c&&c.sealedType]||16};
+  function boxShip(lines,meta){
+    const m=meta||{};
+    const tiers=(Array.isArray(m.shipTiers)&&m.shipTiers.length?m.shipTiers:DEFAULT_TIERS).filter(t=>t&&Number(t.price)>=0).slice().sort((a,b)=>(a.upTo==null?1e9:a.upTo)-(b.upTo==null?1e9:b.upTo));
+    const items=lines.filter(x=>heavyOf(x.c));
+    const oz=Math.round((items.reduce((n,x)=>n+ozOf(x.c)*x.q,0)+(m.packOz!=null?Number(m.packOz):8))*10)/10;
+    const t=tiers.find(t=>t.upTo==null||oz<=Number(t.upTo))||tiers[tiers.length-1]||{price:15};
+    return {oz,price:Math.round(Number(t.price)*100)/100};
+  }
+  const lbs=oz=>{const l=oz/16;return (l<1?l.toFixed(2):l.toFixed(1)).replace(/\.?0+$/,'')+' lb'};
+
+  // ---- away mode (card shows): date-based so it switches on/off by itself, no publish needed on the day
+  const todayCT=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Chicago'});
+  const fmtDay=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}):'';
+  const dayAfter=d=>{const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+1);return x.toISOString().slice(0,10)};
+  function away(){
+    const v=meta&&meta.away; if(!v||!v.on||!v.start||!v.end) return null;
+    const t=todayCT(); if(t>v.end) return null;
+    return {...v,active:t>=v.start,soon:t<v.start,back:dayAfter(v.end),range:v.start===v.end?fmtDay(v.start):`${fmtDay(v.start)} to ${fmtDay(v.end)}`};
+  }
+  const paused=()=>{const a=away();return !!(a&&a.active&&a.mode==='pause')};
+  function shipWhen(){const a=away();return (a&&a.active)?`after I'm back on ${fmtDay(a.back)}`:'within 2 business days'}
+  function renderAway(){
+    const a=away(), b=$('awayBanner');
+    if(!a||(a.soon&&a.start>new Date(Date.now()+10*864e5).toLocaleDateString('en-CA',{timeZone:'America/Chicago'}))){b.hidden=true}
+    else{
+      b.hidden=false; b.className='away'+(a.soon?' soon':'');
+      const msg=a.message?` ${esc(a.message)}`:'';
+      b.innerHTML=a.soon?`<span class="ico">🗓️</span><span><b>Heads up:</b> I'm away at a card show ${esc(a.range)}. ${a.mode==='pause'?'Checkout pauses while I\'m gone.':'Orders placed then ship when I\'m back.'}${msg}</span>`
+        :`<span class="ico">🎴</span><span><b>Away at a card show, ${esc(a.range)}.</b> ${a.mode==='pause'?`Checkout is paused until ${esc(fmtDay(a.back))}. Browse and fill your cart; it'll be here when I'm back.`:`You can still order. Everything ships after I'm back on ${esc(fmtDay(a.back))}.`}${msg}</span>`;
+    }
+    $('step4').textContent=`Ships tracked ${shipWhen()}`;
+    const wp=$('whoPill'); if(!priv){wp.classList.toggle('awayp',!!(a&&a.active));wp.textContent=(a&&a.active)?'Away · card show':'Browsing'}
+    renderAwayOwner();
+  }
+  function renderShipRates(){
+    const box=$('shipRates'); if(!priv||!box||box.contains(document.activeElement)) return;
+    const m=meta||{}, tiers=(Array.isArray(m.shipTiers)&&m.shipTiers.length?m.shipTiers:DEFAULT_TIERS).slice().sort((a,b)=>(a.upTo==null?1e9:a.upTo)-(b.upTo==null?1e9:b.upTo));
+    const row=(t,i)=>`<tr><td>${t.upTo==null?'Anything heavier':`Up to <input data-tu="${i}" type="number" min="0.1" step="0.1" value="${+(t.upTo/16).toFixed(2)}" style="width:70px"> lb`}</td><td class="r">$<input data-tp="${i}" type="number" min="0" step="0.01" value="${Number(t.price).toFixed(2)}" style="width:80px"></td></tr>`;
+    box.innerHTML=`<div class="sect" style="font:800 10.5px var(--body);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 6px">Box shipping (orders with sealed or slabs)</div>
+      <p class="note" style="margin:0 0 8px">${Array.isArray(m.shipTiers)&&m.shipTiers.length?'Your rates.':'Starter rates, not yours yet: check them against what you actually pay to ship and save.'} The order's total weight, plus packing, picks the row. Card-only orders keep the ${money(shop().ship)} mailer and free-shipping rules.</p>
+      <div class="tbl"><table id="tierTbl">${tiers.map(row).join('')}</table></div>
+      <div class="form" style="margin-top:8px"><label>Packing adds, oz<input id="sh_pack" type="number" min="0" step="0.5" value="${m.packOz!=null?m.packOz:8}"></label></div>
+      <div class="cta" style="grid-template-columns:auto auto 1fr;align-items:center"><button class="btn primary" id="shSave" style="padding:9px 14px">Save rates</button><button class="btn ghost" id="shAdd" style="padding:9px 14px">+ Add a row</button><span class="note" id="shMsg"></span></div>`;
+    const read=()=>{const out=[];box.querySelectorAll('[data-tp]').forEach(p=>{const i=p.dataset.tp,u=box.querySelector(`[data-tu="${i}"]`);out.push({upTo:u?Math.round(parseFloat(u.value)*16*10)/10:null,price:Math.round(parseFloat(p.value)*100)/100})});return out};
+    $('shAdd').onclick=()=>{const cur=read(),last=cur.filter(t=>t.upTo!=null).map(t=>t.upTo);const next=(last.length?Math.max(...last):0)+80;cur.push({upTo:next,price:0});meta={...meta,shipTiers:cur};document.activeElement&&document.activeElement.blur();renderShipRates();};
+    $('shSave').onclick=async()=>{
+      const msg=$('shMsg'),t=read(),pack=parseFloat($('sh_pack').value);
+      if(t.some(x=>!(x.price>=0)||(x.upTo!=null&&!(x.upTo>0)))){msg.className='note down';msg.textContent='Every row needs a weight and a price.';return}
+      if(!t.some(x=>x.upTo==null))t.push({upTo:null,price:Math.max(...t.map(x=>x.price))});
+      if(!(pack>=0)){msg.className='note down';msg.textContent='Packing weight must be a number.';return}
+      $('shSave').disabled=true;msg.className='note';msg.textContent='Saving…';
+      try{await db.doc('meta/site').update({shipTiers:t.sort((a,b)=>(a.upTo==null?1e9:a.upTo)-(b.upTo==null?1e9:b.upTo)),packOz:pack});msg.textContent='Saved. The public site uses them after the next publish.'}catch(e){$('shSave').disabled=false;msg.className='note down';msg.textContent='Could not save ('+(e.code||'error')+').'}
+    };
+  }
+  function renderAwayOwner(){
+    renderShipRates();
+    if(!priv||!$('awayBox')) return;
+    const v=(meta&&meta.away)||{}, a=away();
+    $('awayState').textContent=a?(a.active?`on now, back ${fmtDay(a.back)}`:`scheduled ${a.range}`):'off';
+    $('awayBox').innerHTML=`<p class="note" style="margin:0 0 8px">Set your show dates ahead of time. The public site turns away mode on and off by itself on those dates (Central time). Save it on a weekday so the publisher picks it up, or say "publish the vault".</p>
+      <form class="form" id="awayForm" novalidate>
+        <label>First day away<input id="aw_start" type="date" value="${esc(v.start||'')}"></label>
+        <label>Last day away<input id="aw_end" type="date" value="${esc(v.end||'')}"></label>
+        <div class="wide seg"><label class="radio"><input type="radio" name="aw_mode" value="pause" ${v.mode!=='ship'?'checked':''}> Pause checkout</label><label class="radio"><input type="radio" name="aw_mode" value="ship" ${v.mode==='ship'?'checked':''}> Keep selling, ship when back</label></div>
+        <label class="wide">Note for buyers (optional)<input id="aw_msg" maxlength="140" value="${esc(v.message||'')}" placeholder="e.g. Come say hi at booth 42, Collect-A-Con Dallas!"></label>
+      </form>
+      <div class="cta" style="grid-template-columns:1fr 1fr"><button class="btn primary" id="awSave">${a?'Update away dates':'Turn on away mode'}</button><button class="btn" id="awOff" ${v.on?'':'disabled'}>Turn off now</button></div>
+      <p class="note" id="awMsg"></p>`;
+    const msg=$('awMsg'),bad=m=>{msg.textContent=m;msg.className='note down'};
+    $('awSave').onclick=async()=>{
+      const st=$('aw_start').value,en=$('aw_end').value,mode=(document.querySelector('input[name=aw_mode]:checked')||{}).value||'pause';
+      if(!st||!en)return bad('Pick the first and last day you\'re away.');
+      if(en<st)return bad('The last day has to be on or after the first day.');
+      if(en<todayCT())return bad('Those dates are already over.');
+      $('awSave').disabled=true; msg.className='note'; msg.textContent='Saving…';
+      try{await db.doc('meta/site').update({away:{on:true,start:st,end:en,mode,message:$('aw_msg').value.trim()}});msg.textContent='Saved. Buyers see it on the dates you picked.'}catch(e){$('awSave').disabled=false;bad('Could not save ('+(e.code||'error')+'). Try again.')}
+    };
+    $('awOff').onclick=async()=>{
+      $('awOff').disabled=true;
+      try{await db.doc('meta/site').update({away:{...v,on:false}})}catch(e){$('awOff').disabled=false;bad('Could not save ('+(e.code||'error')+').')}
+    };
+  }
 
   // ---- tabs (hash: #cards / #owner)
   function showTab(t){
@@ -318,26 +473,89 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     const order=['NM','LP','MP','HP','DMG'];
     fillSelect($('fCond'),uniq('cond').sort((a,b)=>order.indexOf(a)-order.indexOf(b)));
     fillSelect($('fRar'),uniq('rarity').filter(r=>r!=='None'));
+    ['single','sealed','slab'].forEach(k=>{const n=cards.filter(c=>!c.sold&&kindOf(c)===k).length;$('kn_'+k).textContent=n?String(n):''});
+    $('kinds').hidden=!cards.some(c=>kindOf(c)!=='single');
+    if(kindF&&$('kinds').hidden)kindF='';
   }
-  const picOf=c=>c.img?`<img src="img/${esc(c.img)}.jpg" alt="${esc(c.name)}" loading="lazy">`:'';
+  const kindOf=c=>(c&&(c.kind==='sealed'||c.kind==='slab'))?c.kind:'single';
+  const safeUrl=u=>/^https:\/\/[^\s"'<>()]+$/.test(String(u||''))?String(u):'';
+  const tcgImg=id=>id?`https://tcgplayer-cdn.tcgplayer.com/product/${id}_in_1000x1000.jpg`:'';
+  const tcgIdFrom=u=>{const m=String(u||'').match(/tcgplayer\.com\/product\/(\d+)/i)||String(u||'').trim().match(/^(\d{3,9})$/);return m?m[1]:''};
+  const boxed=c=>kindOf(c)==='sealed'?' shelf':'';
+  const pkgShape=t=>/pack/i.test(t||'')&&!/bundle/i.test(t||'')?'pack':/tin/i.test(t||'')?'tin':/elite|etb/i.test(t||'')?'etb':/blister|build/i.test(t||'')?'blister':'box';
+  const shortSet=s=>String(s||'').replace(/^[A-Z]{2,5}\d*[a-z]?:\s*/,'');
+  // your own photos: uploaded on the Owner desk, served from the vault here and from photos/ on the public site
+  const photoSrc=c=>(c&&/^[0-9a-f]{32}$/.test(c.photo||''))?(window.VAULT_DATA?`photos/${c.photo}.jpg`:`/_blob/${c.photo}`):'';
+  let assetsNs; async function getAssets(){if(assetsNs===undefined){try{assetsNs=await claude.use('assets')}catch(e){assetsNs=null}}return assetsNs}
+  async function shrinkPhoto(file){
+    let src; try{src=await createImageBitmap(file,{imageOrientation:'from-image'})}catch(e){src=await new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>no(new Error('bad image'));im.src=URL.createObjectURL(file)})}
+    const w=src.width,h=src.height,sc=Math.min(1,1400/Math.max(w,h));
+    const cv=document.createElement('canvas');cv.width=Math.round(w*sc);cv.height=Math.round(h*sc);
+    const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(src,0,0,cv.width,cv.height);
+    return await new Promise((ok,no)=>cv.toBlob(b=>b?ok(b):no(new Error('encode')),'image/jpeg',0.86));
+  }
+  // file picker + upload, used by both edit forms; calls onDone(id|null)
+  function photoField(prefix,current,onDone){
+    const html=`<div class="wide photoF" id="${prefix}_photoBox" hidden><div class="sect" style="margin:0 0 6px">Your own photo</div>
+      <div class="photoRow"><label class="btn" style="flex:0 0 auto;cursor:pointer">📷 ${current?'Replace photo':'Upload photo'}<input id="${prefix}_file" type="file" accept="image/*" hidden></label>
+      <button type="button" class="btn ghost" id="${prefix}_rmPhoto" ${current?'':'hidden'}>Remove photo</button>
+      <span class="why" id="${prefix}_photoMsg">${current?'Using your photo.':'JPG, PNG or HEIC from your phone or PC. Shown instead of the stock image.'}</span></div></div>`;
+    const wire=async()=>{
+      const a=await getAssets(); const box=$(prefix+'_photoBox'); if(!a||!box) return; box.hidden=false;
+      const msg=$(prefix+'_photoMsg'), rm=$(prefix+'_rmPhoto'), inp=$(prefix+'_file');
+      inp.onchange=async()=>{const f=inp.files&&inp.files[0]; if(!f)return;
+        msg.className='why';msg.textContent='Uploading…';
+        try{const blob=await shrinkPhoto(f);const r=await a.upload(blob);msg.textContent='Photo uploaded. Save to keep it.';rm.hidden=false;onDone(r.id)}
+        catch(e){msg.className='why down';msg.textContent=e&&e.code==='quota_exceeded'?'Photo storage is full. Remove some old photos first.':'That photo could not be uploaded. Try a JPG or PNG.'}
+        inp.value=''};
+      rm.onclick=()=>{onDone(null);rm.hidden=true;msg.className='why';msg.textContent='Photo removed. Save to keep the change.'};
+    };
+    return {html,wire};
+  }
+  const slabLabel=c=>[c.grader,c.grade].filter(Boolean).join(' ');
+  function phOf(c){
+    const k=kindOf(c);
+    if(k==='slab') return `<div class="slabph"><div class="lab"><span>${esc(c.grader||'Graded')} · ${esc(String(c.name||'').split(' - ')[0])}</span><b>${esc(c.grade||'')}</b></div><div class="win"></div></div>`;
+    if(k==='sealed') return `<div class="ph sealedph"><div class="pkg ${pkgShape(c.sealedType)}"><div class="in"><div class="k">${esc(c.sealedType||'Sealed')}</div><div class="n">${esc(shortSet(c.set)||String(c.name||'').replace(/\s*(booster box|elite trainer box|booster bundle|booster pack|tin)\s*$/i,'')||'Pokémon TCG')}</div><div class="band"></div></div></div></div>`;
+    return '';
+  }
+  function picOf(c){
+    const k=kindOf(c), p=photoSrc(c), u=p||(k==='single'?'':safeUrl(c.imgUrl));
+    if(k==='single'){
+      const stock=c.img?`img/${esc(c.img)}.jpg`:'';
+      if(p) return `<img src="${esc(p)}" alt="${esc(c.name)}" loading="lazy"${stock?` onerror="this.onerror=null;this.src='${stock}'"`:''}>`;
+      return stock?`<img src="${stock}" alt="${esc(c.name)}" loading="lazy">`:'';
+    }
+    return phOf(c)+(u?`<img src="${esc(u)}" alt="${esc(c.name)}" loading="lazy" style="position:relative" onerror="this.remove()">`:'')+(k==='slab'&&u&&slabLabel(c)?`<div class="slabtag">${esc(slabLabel(c))}</div>`:'')+(k==='sealed'&&c.sealedType?`<div class="sealtag">${esc(c.sealedType)}</div>`:'');
+  }
+  function detailOf(c,short){
+    const k=kindOf(c);
+    if(k==='sealed') return [c.sealedType,c.set,c.language&&c.language!=='English'?c.language:'',short?'':'Factory sealed'].filter(Boolean).join(' · ');
+    if(k==='slab') return [c.set,c.number?'#'+c.number:'',slabLabel(c),!short&&c.cert?'Cert #'+c.cert:''].filter(Boolean).join(' · ');
+    return [c.set,c.number?'#'+c.number:'',c.cond,short?'':c.printing,!short&&c.language==='Japanese'?'Japanese':''].filter(Boolean).join(' · ');
+  }
+  let kindF=''; try{kindF=localStorage.getItem('vault-kind')||''}catch(e){}
+  $('kinds').addEventListener('click',e=>{const b=e.target.closest('[data-kind]');if(!b)return;kindF=b.dataset.kind;try{localStorage.setItem('vault-kind',kindF)}catch(e){}render()});
+  let xcost={}; // private cost per sealed/slab item (owner only)
   function render(){
     const q=$('q').value.trim().toLowerCase(), lang=$('fLang').value, set=$('fSet').value, cond=$('fCond').value, rar=$('fRar').value, sort=$('sort').value;
-    let list=cards.filter(c=>(!q||(c.name+' '+c.set+' '+c.number).toLowerCase().includes(q))&&(!lang||c.language===lang)&&(!set||c.set===set)&&(!cond||c.cond===cond)&&(!rar||c.rarity===rar));
+    document.querySelectorAll('#kinds [data-kind]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.kind===kindF)));
+    let list=cards.filter(c=>(!kindF||kindOf(c)===kindF)&&(!q||[c.name,c.set,c.number,c.sealedType,c.grader,c.grade,c.cert,kindOf(c)==='single'?'':kindOf(c)].filter(Boolean).join(' ').toLowerCase().includes(q))&&(!lang||c.language===lang)&&(!set||c.set===set)&&(!cond||c.cond===cond)&&(!rar||c.rarity===rar));
     const by={'price-desc':(a,b)=>(askOf(b)??-1)-(askOf(a)??-1),'price-asc':(a,b)=>(askOf(a)??1e9)-(askOf(b)??1e9),'chg-desc':(a,b)=>(b.chg7??-1e9)-(a.chg7??-1e9),'name':(a,b)=>a.name.localeCompare(b.name),'new':(a,b)=>(b.added||'').localeCompare(a.added||'')||b.id-a.id};
     list.sort((a,b)=>(!!a.sold-!!b.sold)||by[sort](a,b));
-    $('count').textContent=cards.length?`${list.length} of ${cards.length} cards`:'';
+    $('count').textContent=cards.length?`${list.length} of ${cards.length} items`:'';
     const active=FILTER_IDS.filter(id=>$(id).value).length; $('fCount').textContent=active?String(active):'';
     if(!cards.length){$('grid').innerHTML='<div class="empty">The vault is empty right now. Scan cards into Card Vault and sync to fill this page.</div>';return}
-    if(!list.length){$('grid').innerHTML='<div class="empty">No cards match those filters.</div>';return}
+    if(!list.length){$('grid').innerHTML=`<div class="empty">${kindF&&!cards.some(c=>kindOf(c)===kindF)?`No ${kindF==='slab'?'graded slabs':kindF==='sealed'?'sealed product':'singles'} listed right now. Check back soon or ask in the Discord.`:'Nothing matches those filters.'}</div>`;return}
     $('grid').innerHTML=list.map(c=>{
-      const holo=/holo/i.test(c.printing)||/(art|secret|hyper|ultra|illustration)/i.test(c.rarity);
-      const cost=priv?priv.costs[String(c.id)]:null;
+      const k=kindOf(c), holo=k==='slab'||(k==='single'&&(/holo/i.test(c.printing)||/(art|secret|hyper|ultra|illustration)/i.test(c.rarity)));
+      const cost=priv?(k==='single'?priv.costs[String(c.id)]:xcost[String(c.id)]):null;
       const pnl=(cost!=null&&c.price!=null)?(c.price-cost)*c.qty:null;
       const ask=askOf(c); const canBuy=!c.sold&&ask!=null;
       return `<article class="card${holo?' holo':''}${c.sold?' sold':''}" data-id="${c.id}">
-        <div class="pic" data-open="${c.id}">${picOf(c)}${ask!=null&&!c.sold?`<div class="tagprice">${money(ask)}${c.ask!=null&&c.price!=null?`<small>mkt ${money(c.price)}</small>`:''}</div>`:''}${c.sold?'<div class="stamp">SOLD</div>':''}</div>
-        <div><div class="name">${esc(c.name)}</div><div class="set">${esc(c.set)}${c.number?' · #'+esc(c.number):''}</div></div>
-        ${c.notes?`<div class="set" style="font-style:italic">${esc(c.notes)}</div>`:''}<div class="badges"><span class="b cond">${esc(c.cond)}</span>${c.printing?`<span class="b">${esc(c.printing.replace(' - Japanese',''))}</span>`:''}${c.language==='Japanese'?'<span class="b jp">JP</span>':''}${c.rarity&&c.rarity!=='None'?`<span class="b ${rarityCls(c.rarity)}">${esc(c.rarity)}</span>`:''}${c.qty>1?`<span class="b">×${c.qty}</span>`:''}${myOffers[c.id]&&['pending','accepted'].includes(myOffers[c.id].status)?`<span class="b ${myOffers[c.id].status==='accepted'?'teal':'gold'}">${myOffers[c.id].status==='accepted'?'Offer accepted':'Offer pending'} ${money(myOffers[c.id].amount)}</span>`:''}</div>
+        <div class="pic${boxed(c)}" data-open="${c.id}">${picOf(c)}${ask!=null&&!c.sold?`<div class="tagprice">${money(ask)}${c.ask!=null&&c.price!=null?`<small>mkt ${money(c.price)}</small>`:''}</div>`:''}${c.sold?'<div class="stamp">SOLD</div>':''}</div>
+        <div><div class="name">${esc(c.name)}</div><div class="set">${esc(k==='single'?[c.set,c.number?'#'+c.number:''].filter(Boolean).join(' · '):detailOf(c,true))}</div></div>
+        ${c.notes?`<div class="set" style="font-style:italic">${esc(c.notes)}</div>`:''}<div class="badges">${k==='sealed'?`<span class="b kind">Sealed</span>`:k==='slab'?`<span class="b kind">${esc(slabLabel(c)||'Graded')}</span>`:`<span class="b cond">${esc(c.cond)}</span>`}${c.printing?`<span class="b">${esc(c.printing.replace(' - Japanese',''))}</span>`:''}${c.language==='Japanese'?'<span class="b jp">JP</span>':''}${c.rarity&&c.rarity!=='None'?`<span class="b ${rarityCls(c.rarity)}">${esc(c.rarity)}</span>`:''}${c.qty>1?`<span class="b">×${c.qty}</span>`:''}${myOffers[c.id]&&['pending','accepted'].includes(myOffers[c.id].status)?`<span class="b ${myOffers[c.id].status==='accepted'?'teal':'gold'}">${myOffers[c.id].status==='accepted'?'Offer accepted':'Offer pending'} ${money(myOffers[c.id].amount)}</span>`:''}</div>
         <div class="price" data-pricebox="${c.id}"><span class="p">${ask==null?'<span class="warn" style="font-size:13px">ask for price</span>':money(ask)}</span><span class="chg ${cls(c.chg7)}">${c.chg7==null?'':pct(c.chg7)+' 7d'}</span></div>
         ${priv?`<div class="own"><span>paid ${money(cost)}</span><span class="${cls(pnl)}">${signed(pnl)}</span></div>`:''}
         <div class="actions">${canBuy?`<button class="btn primary" data-add="${c.id}">${cart[c.id]?'In cart ✓':'Add to cart'}</button>`:`<button class="btn" disabled>${c.sold?'Sold':'Message for price'}</button>`}${priv?`<button class="btn ghost" data-edit="${c.id}">Edit</button><button class="btn ghost" data-sold="${c.id}">${c.sold?'Relist':'Mark sold'}</button>`:''}</div>
@@ -346,7 +564,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   $('grid').addEventListener('click',async e=>{
     const o=e.target.closest('[data-open]'); if(o){openBuy(Number(o.dataset.open));return}
     const ad=e.target.closest('[data-add]'); if(ad){addToCart(ad.dataset.add,1);ad.textContent='In cart ✓';return}
-    const ed=e.target.closest('[data-edit]'); if(ed&&db){openEdit(Number(ed.dataset.edit));return}
+    const ed=e.target.closest('[data-edit]'); if(ed&&db){const id=Number(ed.dataset.edit);kindOf(byId[id])==='single'?openEdit(id):openExtra(id);return}
     const pb=e.target.closest('[data-price]'); if(pb&&db){
       const c=byId[pb.dataset.price]; const box=document.querySelector(`[data-pricebox="${c.id}"]`);
       box.innerHTML=`<input type="number" step="0.01" min="0" value="${c.ask!=null?c.ask:(c.price!=null?c.price.toFixed(2):'')}" aria-label="Your price" style="width:90px;padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-family:var(--mono)"> <button class="btn primary" data-save="${c.id}" style="flex:0;padding:5px 10px">Save</button> <button class="btn ghost" data-clear="${c.id}" style="padding:5px 8px">Market</button>`;
@@ -382,8 +600,9 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     const disc=Math.round(listSub*rate)/100;
     const after=sub-disc;
     const maxed=units>=2&&rate>=s.bundleMax;
-    const ship=lines.length?((after>=s.freeShipAt||maxed)?0:s.ship):0;
-    return {lines,sub,units,rate,disc,after,ship,maxed,total:after+ship};
+    const heavy=lines.some(x=>heavyOf(x.c)), box=heavy?boxShip(lines,meta):null;
+    const ship=!lines.length?0:heavy?box.price:((after>=s.freeShipAt||maxed)?0:s.ship);
+    return {lines,sub,units,rate,disc,after,ship,maxed,heavy,oz:box?box.oz:0,total:Math.round((after+ship)*100)/100};
   }
   function addToCart(id,q){const c=byId[id];if(!c)return;cart[id]=Math.min((cart[id]||0)+q,c.qty||1);saveCart();updateCartBtn()}
   function updateCartBtn(){const n=cartCount();$('cartBtn').hidden=false;$('cartN').textContent=n?String(n):'';$('cartBtn').classList.toggle('has',n>0)}
@@ -403,8 +622,9 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     if(changed){saveOffers();render();if(view==='card'&&cur)drawBuy();if(view==='cart')openCart()}
   }
   function offerBlock(c){
-    if(!canSend()||c.sold||askOf(c)==null) return '';
+    if(!canSend()||c.sold||askOf(c)==null||kindOf(c)==='sealed') return '';
     const o=myOffers[c.id];
+    if(paused()&&!(o&&o.status==='accepted')) return '';
     if(o&&o.status==='pending') return `<div class="offerbox"><b>Your offer of ${money(o.amount)} is pending.</b><span class="why">You'll see the answer right here, usually within a day. Offers expire after 3 days.</span><button class="rm" id="offerWithdraw">forget this offer</button></div>`;
     if(o&&o.status==='accepted'){const inC=cartOffers[c.id]===o.id;return `<div class="offerbox ok"><b>Offer accepted: ${money(o.amount)}</b><span class="why">Check out by ${new Date(o.checkoutBy).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'})} to lock it in.</span><button class="btn primary" id="offerAdd" ${inC?'disabled':''}>${inC?'In your cart at the offer price':`Add to cart at ${money(o.amount)}`}</button></div>`}
     const note=o?`<span class="why">${OFFER_LABEL[o.status]||''}${o.status==='declined'?'. You can still buy at the list price or try another offer.':''}</span>`:'';
@@ -436,7 +656,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         const j=await r.json().catch(()=>({}));
         if(r.ok&&j.offer){myOffers[c.id]=j.offer;saveOffers();render();drawBuy();return}
         btn.disabled=false;btn.textContent='Send offer';
-        bad(j.error==='too_low'?`The lowest offer for this card is ${money(j.floor)}.`:j.error==='unavailable'?'Sorry, this card just sold.':j.error==='rate_limited'?'Too many offers from your connection in the last hour. Try again later.':'Could not send the offer right now. Try again in a minute.');
+        bad(j.error==='no_offers'?'Sealed product is fixed price, no offers.':j.error==='too_low'?`The lowest offer for this card is ${money(j.floor)}.`:j.error==='unavailable'?'Sorry, this card just sold.':j.error==='rate_limited'?'Too many offers from your connection in the last hour. Try again later.':'Could not send the offer right now. Try again in a minute.');
       }catch(err){btn.disabled=false;btn.textContent='Send offer';bad('Could not reach the shop. Check your connection.')}
     });
   }
@@ -452,16 +672,16 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     const unavailable=cur.sold||ask==null;
     $('buy').innerHTML=`<div class="sheet" role="dialog" aria-label="${esc(cur.name)}">
       <button class="close" id="closeBuy" aria-label="Close">×</button>
-      <div class="pic">${picOf(cur)}${cur.sold?'<div class="stamp">SOLD</div>':''}</div>
+      <div class="pic${boxed(cur)}">${picOf(cur)}${cur.sold?'<div class="stamp">SOLD</div>':''}</div>
       <div>
         <h2>${esc(cur.name)}</h2>
-        <div class="set">${esc(cur.set)} · #${esc(cur.number)} · ${esc(cur.cond)} · ${esc(cur.printing)}${cur.language==='Japanese'?' · Japanese':''}</div>${cur.notes?`<p class="note" style="font-style:italic;margin:8px 0 0">${esc(cur.notes)}</p>`:''}
+        <div class="set">${esc(detailOf(cur))}</div>${cur.notes?`<p class="note" style="font-style:italic;margin:8px 0 0">${esc(cur.notes)}</p>`:''}
         ${unavailable?`<p class="note" style="margin-top:14px">${cur.sold?'This one is sold.':'No market match yet. DM for a price.'}</p>`:`
         <div class="sum">
           <div><span>Price${cur.ask!=null&&cur.price!=null?` <small class="why">(market ${money(cur.price)})</small>`:''}</span><span class="num">${money(ask)}</span></div>
           ${cur.qty>1?`<div><span>Quantity <small class="why">(${cur.qty} available)</small></span><span class="qty"><button id="qm" aria-label="Fewer">−</button><span class="num">${qty}</span><button id="qp" aria-label="More">+</button></span></div>`:''}
         </div>
-        <div class="perks"><span>🎁 ${s.bundlePct}% off per card when you buy 2+ (up to ${s.bundleMax}%)</span><span>📦 Free shipping at ${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards, else ${money(s.ship)} tracked</span><span>💸 Venmo or Cash App</span>${canSend()?'<span>🤝 Offers up to 10% under list</span>':''}</div>
+        <div class="perks"><span>🎁 ${s.bundlePct}% off per card when you buy 2+ (up to ${s.bundleMax}%)</span><span>📦 ${heavyOf(cur)?`Ships boxed, priced by weight at checkout (from ${money(boxShip([{c:cur,q:1}],meta).price)})`:`Free shipping at ${money(s.freeShipAt)} or ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards, else ${money(s.ship)} tracked`}</span><span>💸 Venmo or Cash App</span>${canSend()&&kindOf(cur)!=='sealed'?'<span>🤝 Offers up to 10% under list</span>':''}</div>
         <div class="cta">
           <button class="btn primary" id="addCart">${inCart?`Add ${qty} more (${inCart} in cart)`:'Add to cart'}</button>
           <button class="btn" id="goCart">${cartCount()?`View cart (${cartCount()})`:'View cart'}</button>
@@ -479,8 +699,8 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   // ---- cart / checkout sheet
   function orderNote(){
     const s=shop(),t=totals();
-    const items=t.lines.map(x=>`• ${x.c.name} (${x.c.set} #${x.c.number}) · ${x.c.cond}${x.q>1?` ×${x.q}`:''} — ${money(x.price*x.q)}${x.offer?' (accepted offer)':''}`).join('\n');
-    return `ORDER — Lazy Lucario Vault\n${items}\nSubtotal: ${money(t.sub)}${t.disc?`\nBundle discount (${t.rate}%): −${money(t.disc)}`:''}\nShipping: ${t.ship?money(t.ship)+' tracked':'FREE'}\nTOTAL: ${money(t.total)}\nPaid with (Venmo / Cash App) and name I paid from: \n\nSHIP TO:\nName: \nAddress: \nCity, State ZIP: `;
+    const items=t.lines.map(x=>`• ${x.c.name} (${detailOf(x.c,true)})${x.q>1?` ×${x.q}`:''} — ${money(x.price*x.q)}${x.offer?' (accepted offer)':''}`).join('\n');
+    return `ORDER — Lazy Lucario Vault\n${items}\nSubtotal: ${money(t.sub)}${t.disc?`\nBundle discount (${t.rate}%): −${money(t.disc)}`:''}\nShipping: ${t.ship?money(t.ship)+(t.heavy?` boxed (~${lbs(t.oz)})`:' tracked'):'FREE'}\nTOTAL: ${money(t.total)}\nPaid with (Venmo / Cash App) and name I paid from: \n\nSHIP TO:\nName: \nAddress: \nCity, State ZIP: `;
   }
   function openCart(){
     view='cart'; cur=null; const s=shop(),t=totals();
@@ -494,18 +714,18 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <h2>Your cart</h2>
         ${cartNotice?`<p class="note down" style="margin-top:8px">${esc(cartNotice)}</p>`:''}
         ${!t.lines.length?`<p class="note" style="margin-top:12px">Nothing in here yet. Tap a card and add it.</p>`:`
-        <div class="lines">${t.lines.map(x=>`<div class="line"><div class="thumb">${picOf(x.c)}</div><div class="lmain"><div class="name">${esc(x.c.name)}</div><div class="set">${esc(x.c.set)} · #${esc(x.c.number)} · ${esc(x.c.cond)}</div></div><div class="lqty"><span class="qty"><button data-dec="${x.c.id}" aria-label="Fewer">−</button><span class="num">${x.q}</span><button data-inc="${x.c.id}" aria-label="More" ${x.offer||x.q>=(x.c.qty||1)?'disabled':''}>+</button></span><span class="num lp">${money(x.price*x.q)}</span>${x.offer?'<span class="b up" style="background:transparent">offer</span>':''}<button class="rm" data-rm="${x.c.id}" aria-label="Remove">remove</button></div></div>`).join('')}</div>
+        <div class="lines">${t.lines.map(x=>`<div class="line"><div class="thumb${boxed(x.c)}" style="position:relative">${picOf(x.c)}</div><div class="lmain"><div class="name">${esc(x.c.name)}</div><div class="set">${esc(detailOf(x.c,true))}</div></div><div class="lqty"><span class="qty"><button data-dec="${x.c.id}" aria-label="Fewer">−</button><span class="num">${x.q}</span><button data-inc="${x.c.id}" aria-label="More" ${x.offer||x.q>=(x.c.qty||1)?'disabled':''}>+</button></span><span class="num lp">${money(x.price*x.q)}</span>${x.offer?'<span class="b up" style="background:transparent">offer</span>':''}<button class="rm" data-rm="${x.c.id}" aria-label="Remove">remove</button></div></div>`).join('')}</div>
         <div class="sum">
-          <div><span>Subtotal <small class="why">(${t.units} card${t.units>1?'s':''})</small></span><span class="num">${money(t.sub)}</span></div>
-          ${t.disc?`<div class="up"><span>Bundle discount ${t.rate}%${t.lines.some(x=>x.offer)?' (not on offer prices)':''} <small class="why">(${s.bundlePct}% per card${t.maxed?', max + free shipping':''})</small></span><span class="num">−${money(t.disc)}</span></div>`:`<div class="why"><span>Add a 2nd card for ${s.bundlePct*2}% off everything (${s.bundlePct}% per card, up to ${s.bundleMax}%)</span><span></span></div>`}
-          <div><span>Shipping${t.ship?' (tracked)':''}</span><span class="num ${t.ship?'':'up'}">${t.ship?money(t.ship):'FREE'}</span></div>
-          ${t.ship?`<div class="why"><span>Free shipping at ${money(s.freeShipAt)}${toFree>0?` (${money(toFree)} more)`:''} or with ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards</span><span></span></div>`:''}
+          <div><span>Subtotal <small class="why">(${t.units} item${t.units>1?'s':''})</small></span><span class="num">${money(t.sub)}</span></div>
+          ${t.disc?`<div class="up"><span>Bundle discount ${t.rate}%${t.lines.some(x=>x.offer)?' (not on offer prices)':''} <small class="why">(${s.bundlePct}% per item${t.maxed?(t.heavy?', max':', max + free shipping'):''})</small></span><span class="num">−${money(t.disc)}</span></div>`:`<div class="why"><span>Add a 2nd card for ${s.bundlePct*2}% off everything (${s.bundlePct}% per card, up to ${s.bundleMax}%)</span><span></span></div>`}
+          <div><span>Shipping${t.heavy?` <small class="why">(boxed, about ${lbs(t.oz)})</small>`:t.ship?' (tracked)':''}</span><span class="num ${t.ship?'':'up'}">${t.ship?money(t.ship):'FREE'}</span></div>
+          ${t.heavy?`<div class="why"><span>Boxes and slabs ship boxed, priced by weight. Free shipping is for card-only orders.</span><span></span></div>`:t.ship?`<div class="why"><span>Free shipping at ${money(s.freeShipAt)}${toFree>0?` (${money(toFree)} more)`:''} or with ${Math.ceil(s.bundleMax/s.bundlePct)}+ cards</span><span></span></div>`:''}
           <div><span>Total</span><span class="num">${money(t.total)}</span></div>
         </div>
-        ${canSend()?orderForm(s,t):`<ol class="steps">
+        ${paused()?`<div class="away" style="margin-top:14px"><span class="ico">🎴</span><span><b>Checkout is paused</b> while I'm at a card show (${esc(away().range)}). Your cart is saved; come back on ${esc(fmtDay(away().back))} to check out.</span></div>`:canSend()?orderForm(s,t):`<ol class="steps">
           <li><b>Pay ${money(t.total)}</b> with Venmo (@${esc(s.venmo)}) or Cash App ($${esc(s.cashapp)}). Both links prefill the amount.</li>
           <li><b>Copy the order note</b>, add your shipping address, and DM it in Discord.</li>
-          <li>Ships ${t.ship?'tracked':'free, tracked'} within 2 business days.</li>
+          <li>Ships ${t.ship?'tracked':'free, tracked'} ${shipWhen()}.</li>
         </ol>
         <div class="cta pay">
           <a class="btn venmo" href="${venmo}" target="_blank" rel="noopener">Venmo ${money(t.total)}</a>
@@ -522,7 +742,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     const cp=$('copyNote');
     if(cp)cp.onclick=()=>{const t2=$('noteBox').value;const done=()=>{cp.textContent='Copied — paste it in Discord';setTimeout(()=>cp.textContent='Copy order note',2500)};
       (navigator.clipboard?navigator.clipboard.writeText(t2).then(done):Promise.reject()).catch(()=>{$('noteBox').focus();$('noteBox').select();cp.textContent='Select all and copy'})};
-    const of=$('orderForm'); if(of){restoreForm();of.addEventListener('input',()=>{saveForm();const m=$('orderMsg');if(m.classList.contains('down')){m.className='note wide';m.textContent='Next you\'ll pay in the app you picked. Ships within 2 business days of payment.'}});of.addEventListener('submit',e=>{e.preventDefault();sendOrder()})}
+    const of=$('orderForm'); if(of){restoreForm();of.addEventListener('input',()=>{saveForm();const m=$('orderMsg');if(m.classList.contains('down')){m.className='note wide';m.textContent=`Next you'll pay in the app you picked. Ships ${away()&&away().active?shipWhen():'within 2 business days of payment'}.`}});of.addEventListener('submit',e=>{e.preventDefault();sendOrder()})}
   }
 
   // ---- send order (static site only: posts the order to Lazy's private Discord channel)
@@ -542,12 +762,13 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       <label class="wide">Name on your Venmo / Cash App<input id="o_paidname" maxlength="80" required></label>
       <label class="wide">Discord username or email (so we can reach you)<input id="o_contact" maxlength="100" required></label>
       <button class="btn primary wide" id="sendOrder" type="submit">Send order · ${money(t.total)}</button>
-      <p class="note wide" id="orderMsg">Next you'll pay ${money(t.total)} in the app you picked. Your order ships ${t.ship?'tracked':'free, tracked'} within 2 business days of payment.</p>
+      <p class="note wide" id="orderMsg">Next you'll pay ${money(t.total)} in the app you picked. Your order ships ${t.ship?'tracked':'free, tracked'} ${away()&&away().active?shipWhen():'within 2 business days of payment'}.</p>
     </form>`;
   }
   function saveForm(){try{const o={};FORM_FIELDS.forEach(k=>{if(k!=='o_paidname')o[k]=$(k).value});localStorage.setItem('vault-ship',JSON.stringify(o))}catch(e){}}
   function restoreForm(){try{const o=JSON.parse(localStorage.getItem('vault-ship')||'{}');Object.entries(o).forEach(([k,v])=>{if($(k)&&!$(k).value)$(k).value=v})}catch(e){}}
   async function sendOrder(){
+    if(paused()){openCart();return}
     const s=shop(),t=totals(),msg=$('orderMsg'),btn=$('sendOrder');
     const v=k=>$(k).value.trim();
     const bad=(m)=>{msg.textContent=m;msg.className='note wide down'};
@@ -602,7 +823,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <div class="sum"><div><span>Total due</span><span class="num">${money(o.total)}</span></div></div>
         <ol class="steps">
           <li><b>Pay ${money(o.total)}</b> on ${esc(o.app)} to ${isV?'@'+esc(s.venmo):'$'+esc(s.cashapp)}${isV?'. The note is prefilled with your order number.':`. Put <b>${esc(o.id)}</b> in the note.`}</li>
-          <li>Your ${o.units} card${o.units>1?'s':''} ship${o.units>1?'':'s'} ${o.ship?'tracked':'free, tracked'} within 2 business days of payment.</li>
+          <li>Your ${o.units} item${o.units>1?'s':''} ship${o.units>1?'':'s'} ${o.ship?'tracked':'free, tracked'} ${away()&&away().active?shipWhen():'within 2 business days of payment'}.</li>
         </ol>
         <div class="cta"><a class="btn ${isV?'venmo':'cash'}" href="${isV?venmo:cash}" target="_blank" rel="noopener">Pay ${money(o.total)} on ${esc(o.app)}</a></div>
         <p class="note">Questions? <a href="${esc(s.discord)}" target="_blank" rel="noopener">Message us on Discord</a> with order ${esc(o.id)}.</p>
@@ -621,12 +842,14 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   // ---- owner edit sheet
   const CONDS=['NM','LP','MP','HP','DMG'];
   function openEdit(id){
-    const c=byId[id]; if(!c) return; cur=null;
+    const c=byId[id]; if(!c) return; cur=null; view='extra';
     const f=(k,label,type='text',extra='')=>`<label>${label}<input id="e_${k}" type="${type}" value="${esc(c[k]??'')}" ${extra}></label>`;
     const sets=[...new Set(cards.map(x=>x.set).filter(Boolean))].sort();
+    let photo=c.photo||null;
+    const pf=photoField('e',photo,id=>{photo=id;$('e_pic').innerHTML=picOf({...c,photo})});
     $('buy').innerHTML=`<div class="sheet" role="dialog" aria-label="Edit ${esc(c.name)}">
       <button class="close" id="closeBuy" aria-label="Close">×</button>
-      <div class="pic">${picOf(c)}</div>
+      <div class="pic" id="e_pic">${picOf(c)}</div>
       <div>
         <h2>Edit listing</h2>
         <div class="set">Changes save to the site only. Card Vault keeps its own record; the next sync merges, it won't overwrite these.</div>
@@ -642,6 +865,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
           <label>Your price (blank = market ${money(c.price)})<input id="e_ask" type="number" step="0.01" min="0" value="${c.ask!=null?c.ask:''}" placeholder="${c.price!=null?c.price.toFixed(2):''}"></label>
           <label>Status<select id="e_sold"><option value="0" ${!c.sold?'selected':''}>Available</option><option value="1" ${c.sold?'selected':''}>Sold</option></select></label>
           <label class="wide">Public note (shown on the card)<textarea id="e_notes">${esc(c.notes??'')}</textarea></label>
+          ${pf.html}
         </div>
         <div class="cta">
           <button class="btn primary" id="saveEdit">Save listing</button>
@@ -651,14 +875,14 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <p class="note" id="editMsg"></p>
       </div></div>`;
     $('buy').hidden=false;
-    $('closeBuy').onclick=closeBuy; $('cancelEdit').onclick=closeBuy;
+    $('closeBuy').onclick=closeBuy; $('cancelEdit').onclick=closeBuy; pf.wire();
     const v=k=>$('e_'+k).value.trim();
     $('saveEdit').onclick=async()=>{
       const askRaw=v('ask'); const qty=parseInt(v('qty'),10);
       if(!v('name')){$('editMsg').textContent='Name is required.';return}
       if(!(qty>=1)){$('editMsg').textContent='Quantity must be at least 1.';return}
       if(askRaw!==''&&!(parseFloat(askRaw)>=0)){$('editMsg').textContent='Price must be a number.';return}
-      const data={name:v('name'),set:v('set'),number:v('number'),rarity:v('rarity'),language:v('language'),printing:v('printing'),cond:v('cond'),qty,notes:v('notes'),sold:v('sold')==='1',ask:askRaw===''?null:Math.round(parseFloat(askRaw)*100)/100};
+      const data={name:v('name'),set:v('set'),number:v('number'),rarity:v('rarity'),language:v('language'),printing:v('printing'),cond:v('cond'),qty,notes:v('notes'),sold:v('sold')==='1',ask:askRaw===''?null:Math.round(parseFloat(askRaw)*100)/100,photo:photo||null};
       $('saveEdit').disabled=true; $('editMsg').textContent='Saving…';
       try{await db.doc('cards/'+c.id).update(data);closeBuy()}catch(err){$('saveEdit').disabled=false;$('editMsg').textContent='Could not save ('+(err.code||'error')+'). Try again.'}
     };
@@ -668,17 +892,137 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     };
   }
 
+  // ---- owner: sealed product + graded slabs (live in the same cards collection; cost kept privately in private/extraCosts)
+  const SEALED_TYPES=['Booster Box','Elite Trainer Box','Booster Bundle','Booster Pack','Collection / Premium Box','Tin','Blister','Build & Battle','Booster Display (JP)','Other'];
+  const GRADERS=['PSA','CGC','BGS','TAG','ACE','SGC','Other'];
+  function renderExtras(){
+    if(!priv||!$('extrasList')) return;
+    const xs=cards.filter(c=>kindOf(c)!=='single').sort((a,b)=>(!!a.sold-!!b.sold)||(b.added||'').localeCompare(a.added||'')||b.id-a.id);
+    if(!xs.length){$('extrasSum').textContent='';$('extrasList').className='note';$('extrasList').innerHTML='Nothing added yet. Booster boxes, ETBs, packs, tins and graded slabs you add here show up in the binder under their own filter, with the same cart and checkout.';return}
+    const live=xs.filter(c=>!c.sold);
+    const val=live.reduce((n,c)=>n+(c.price??askOf(c)??0)*(c.qty||1),0), paid=live.reduce((n,c)=>n+(xcost[c.id]??0)*(c.qty||1),0);
+    $('extrasSum').textContent=`${live.length} listed · worth ${money(val)} · paid ${money(paid)}`;
+    $('extrasList').className='';
+    $('extrasList').innerHTML=xs.map(c=>{
+      const cost=xcost[c.id], ask=askOf(c);
+      const mk=c.price!=null?`mkt ${money(c.price)}${c.priceSrc==='tcgplayer'?' <span class="why">TCGplayer</span>':''}`:(c.tcgId&&kindOf(c)==='sealed'?'<span class="why">market loads within the hour</span>':'<span class="why">no market</span>');
+      return `<div class="xrow"${c.sold?' style="opacity:.55"':''}><div class="thumb">${(photoSrc(c)||safeUrl(c.imgUrl))?`<img src="${esc(photoSrc(c)||safeUrl(c.imgUrl))}" alt="" onerror="this.replaceWith('${kindOf(c)==='slab'?'🏅':'📦'}')">`:(kindOf(c)==='slab'?'🏅':'📦')}</div>
+        <div style="min-width:0"><div class="nm">${esc(c.name)}${c.qty>1?` <span class="why">×${c.qty}</span>`:''}${c.sold?' <span class="b">Sold</span>':''}</div><div class="why">${esc(detailOf(c,true))}</div></div>
+        <div class="r">${ask!=null?money(ask):'<span class="warn">no price</span>'}<div class="why">${mk}</div><div class="why">paid ${money(cost)}</div><button class="btn ghost" data-xedit="${c.id}" style="padding:4px 10px;font-size:12px;margin-top:4px">Edit</button></div></div>`}).join('');
+  }
+  $('viewOwner').addEventListener('click',e=>{
+    if(e.target.closest('#addExtra')){openExtra(null);return}
+    const x=e.target.closest('[data-xedit]'); if(x)openExtra(Number(x.dataset.xedit));
+  });
+  function nextExtraId(){const ids=cards.map(c=>c.id).filter(n=>n>=900000000);return ids.length?Math.max(...ids)+1:900000001}
+  function openExtra(id){
+    if(!db) return;
+    const c=id!=null?byId[id]:null; cur=null; view='extra';
+    let kind=c?kindOf(c):((kindF==='slab')?'slab':'sealed');
+    const sets=[...new Set(cards.map(x=>x.set).filter(Boolean))].sort();
+    const val=k=>esc(c&&c[k]!=null?c[k]:'');
+    const opt=(list,v)=>list.map(x=>`<option ${v===x?'selected':''}>${esc(x)}</option>`).join('');
+    let photo=c&&c.photo||null; let sync=()=>{};
+    const pf=photoField('x',photo,id=>{photo=id;sync()});
+    $('buy').innerHTML=`<div class="sheet one" role="dialog" aria-label="${c?'Edit item':'Add sealed or slab'}">
+      <button class="close" id="closeBuy" aria-label="Close">×</button>
+      <div>
+        <h2>${c?'Edit '+(kind==='slab'?'slab':'sealed item'):'Add sealed or slab'}</h2>
+        <div class="set">Saves to the site right away and goes live on the public storefront at the next hourly publish. What you paid stays private.</div>
+        <form class="form" id="xform" novalidate>
+          <div class="wide seg"><label class="radio"><input type="radio" name="x_kind" value="sealed" ${kind==='sealed'?'checked':''} ${c?'disabled':''}> 📦 Sealed product</label><label class="radio"><input type="radio" name="x_kind" value="slab" ${kind==='slab'?'checked':''} ${c?'disabled':''}> 🏅 Graded slab</label></div>
+          <label class="wide"><span id="x_nameL">Product name</span><input id="x_name" maxlength="120" value="${val('name')}" placeholder="e.g. Surging Sparks Booster Box"></label>
+          <label class="ks">Product type<select id="x_sealedType">${opt(SEALED_TYPES,c&&c.sealedType||'Booster Box')}</select></label>
+          <label class="kg">Grader<select id="x_grader">${opt(GRADERS,c&&c.grader||'PSA')}</select></label>
+          <label class="kg">Grade<input id="x_grade" maxlength="12" value="${val('grade')}" placeholder="10"></label>
+          <label class="kg">Cert number<input id="x_cert" maxlength="30" value="${val('cert')}" inputmode="numeric"></label>
+          <label class="kg">Card number<input id="x_number" maxlength="20" value="${val('number')}" placeholder="215/191"></label>
+          <label class="wide">Set<input id="x_set" list="xsetlist" maxlength="80" value="${val('set')}"><datalist id="xsetlist">${sets.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
+          <label>Language<select id="x_language">${opt(['English','Japanese','Korean','Chinese','Other'],c&&c.language||'English')}</select></label>
+          <label>Quantity<input id="x_qty" type="number" min="1" step="1" value="${c?c.qty||1:1}"></label>
+          <label>Ship weight, oz <span class="why">(each, packed)</span><input id="x_wt" type="number" min="0.1" step="0.1" value="${c&&c.wt?c.wt:''}"></label>
+          <div class="wide sect">Price (each)</div>
+          <label>Your price<input id="x_ask" type="number" step="0.01" min="0" value="${c&&c.ask!=null?c.ask:''}" placeholder="what buyers pay"></label>
+          <label>Market price<input id="x_price" type="number" step="0.01" min="0" value="${c&&c.price!=null&&c.priceSrc!=='tcgplayer'?c.price:''}" placeholder="${c&&c.priceSrc==='tcgplayer'&&c.price!=null?'auto '+c.price.toFixed(2):'optional'}"></label>
+          <label>What you paid <span class="why">(private)</span><input id="x_cost" type="number" step="0.01" min="0" value="${c&&xcost[c.id]!=null?xcost[c.id]:''}"></label>
+          <label class="wide">TCGplayer product link <span class="why" id="x_tcgHint">(fills the photo; sealed also gets its market price filled hourly)</span><input id="x_tcg" maxlength="300" value="${c&&c.tcgId?'https://www.tcgplayer.com/product/'+esc(c.tcgId):''}" placeholder="https://www.tcgplayer.com/product/…"></label>
+          <label class="wide">Photo link <span class="why">(optional, instead of uploading; must start with https://)</span><input id="x_img" maxlength="500" value="${c&&c.imgUrl&&c.imgUrl!==tcgImg(c.tcgId)?esc(c.imgUrl):''}"></label>
+          ${pf.html}
+          <div class="wide prev"><div class="pic" id="x_prev"></div><p class="note" id="x_prevNote" style="margin:0">Preview of how it shows in the binder.</p></div>
+          <label class="wide">Public note <span class="why">(shown on the listing)</span><textarea id="x_notes" maxlength="300">${esc(c&&c.notes||'')}</textarea></label>
+          ${c?`<label>Status<select id="x_sold"><option value="0" ${!c.sold?'selected':''}>Available</option><option value="1" ${c.sold?'selected':''}>Sold</option></select></label>`:''}
+        </form>
+        <div class="cta">
+          <button class="btn primary" id="xsave">${c?'Save':'Add to the vault'}</button>
+          <button class="btn" id="xcancel">Cancel</button>
+          ${c?'<button class="btn danger" id="xdel">Remove from site</button>':''}
+        </div>
+        <p class="note" id="xmsg"></p>
+      </div></div>`;
+    $('buy').hidden=false; $('closeBuy').onclick=closeBuy; $('xcancel').onclick=closeBuy;
+    const g=k=>$('x_'+k).value.trim();
+    const draft=()=>{const tcgId=tcgIdFrom(g('tcg'));const imgUrl=safeUrl(g('img'))||tcgImg(tcgId);
+      const d={kind,name:g('name')||(kind==='slab'?'Card name':'Product name'),set:g('set'),language:g('language'),notes:g('notes'),tcgId,imgUrl,photo:photo||null};
+      if(kind==='sealed')d.sealedType=g('sealedType'); else {d.grader=g('grader');d.grade=g('grade');d.cert=g('cert');d.number=g('number')}
+      return d};
+    sync=()=>{
+      kind=(document.querySelector('input[name=x_kind]:checked')||{}).value||kind;
+      document.querySelectorAll('#xform .ks').forEach(el=>el.hidden=kind!=='sealed');
+      document.querySelectorAll('#xform .kg').forEach(el=>el.hidden=kind!=='slab');
+      $('x_nameL').textContent=kind==='slab'?'Card name':'Product name';
+      $('x_wt').placeholder=String(ozOf({kind,sealedType:g('sealedType')}))+' (typical)';
+      $('x_name').placeholder=kind==='slab'?'e.g. Umbreon VMAX - 215/203':'e.g. Surging Sparks Booster Box';
+      $('x_tcgHint').textContent=kind==='slab'?'(optional, fills the photo; slab prices stay yours to set)':'(fills the photo; the market price is filled in hourly)';
+      const d=draft(); $('x_prev').className='pic'+boxed(d); $('x_prev').innerHTML=picOf(d);
+      const bad=g('tcg')&&!d.tcgId; $('x_prevNote').textContent=bad?'That link doesn\'t look like a TCGplayer product page.':g('img')&&!safeUrl(g('img'))?'Photo links must start with https://':'Preview of how it shows in the binder.';
+      $('x_prevNote').className=bad||(g('img')&&!safeUrl(g('img')))?'note down':'note';
+    };
+    $('xform').addEventListener('input',sync); $('xform').addEventListener('change',e=>{if(e.target.type!=='file')sync()}); $('xform').addEventListener('submit',e=>e.preventDefault()); sync(); pf.wire();
+    $('xsave').onclick=async()=>{
+      const msg=$('xmsg'), bad=m=>{msg.textContent=m;msg.className='note down'};
+      const num=k=>{const v=g(k);return v===''?null:Math.round(parseFloat(v)*100)/100};
+      const qty=parseInt(g('qty'),10), ask=num('ask'), price=num('price'), cost=num('cost'), wt=g('wt')===''?null:Math.round(parseFloat(g('wt'))*10)/10;
+      if(wt!=null&&!(wt>0))return bad('Weight must be a number of ounces, like 24.');
+      if(!g('name'))return bad(kind==='slab'?'Add the card name.':'Add the product name.');
+      if(kind==='slab'&&!g('grade'))return bad('Add the grade (for example 10 or 9.5).');
+      if(!(qty>=1))return bad('Quantity must be at least 1.');
+      if([ask,price,cost].some(v=>v!=null&&!(v>=0)))return bad('Prices must be numbers.');
+      if(g('tcg')&&!tcgIdFrom(g('tcg')))return bad('That TCGplayer link doesn\'t look right. Paste the product page link, or leave it blank.');
+      if(g('img')&&!safeUrl(g('img')))return bad('Photo links must start with https://');
+      const d=draft();
+      if(ask==null&&price==null&&!(kind==='sealed'&&d.tcgId))return bad('Set your price, a market price, or paste the TCGplayer link so it can be priced.');
+      const data={...d,cond:kind==='sealed'?'Sealed':slabLabel(d),printing:'',rarity:'',qty,ask,wt,sold:c?$('x_sold').value==='1':false};
+      if(kind==='sealed'){data.number=''}
+      if(price!=null){data.price=price;data.priceSrc='manual'}
+      else if(!c||c.priceSrc!=='tcgplayer'||c.tcgId!==d.tcgId){data.price=null;data.priceSrc=(kind==='sealed'&&d.tcgId)?'tcgplayer':null}
+      const newId=c?c.id:nextExtraId();
+      $('xsave').disabled=true; msg.className='note'; msg.textContent='Saving…';
+      try{
+        if(c) await db.doc('cards/'+newId).update(data);
+        else await db.doc('cards/'+newId).set({...data,added:new Date().toLocaleDateString('en-CA'),chg7:null});
+        const nc={...xcost}; if(cost!=null)nc[newId]=cost; else delete nc[newId];
+        if(JSON.stringify(nc)!==JSON.stringify(xcost)) await db.doc('private/extraCosts').set({costs:nc});
+        closeBuy();
+      }catch(err){$('xsave').disabled=false;bad('Could not save ('+(err.code||'error')+'). Try again.')}
+    };
+    const del=$('xdel'); if(del)del.onclick=async()=>{
+      if(del.dataset.armed!=='1'){del.dataset.armed='1';del.textContent='Really remove? Click again';return}
+      del.disabled=true;
+      try{await db.doc('cards/'+c.id).delete();if(xcost[c.id]!=null){const nc={...xcost};delete nc[c.id];try{await db.doc('private/extraCosts').set({costs:nc})}catch(e){}}closeBuy()}catch(err){del.disabled=false;$('xmsg').textContent='Could not remove ('+(err.code||'error')+').'}
+    };
+  }
+
   // ---- public header stats
   function renderFan(){
-    const top=cards.filter(c=>!c.sold&&askOf(c)!=null&&c.img).sort((a,b)=>askOf(b)-askOf(a)).slice(0,3);
+    const top=cards.filter(c=>!c.sold&&askOf(c)!=null&&(photoSrc(c)||(kindOf(c)==='single'?c.img:safeUrl(c.imgUrl)))).sort((a,b)=>askOf(b)-askOf(a)).slice(0,3);
     const fan=$('fan'); if(!top.length){fan.className='fan empty';fan.textContent='Top pulls appear here';return}
     fan.className='fan';
     const pose=[['-14deg','-38%'],['0deg','0%'],['14deg','38%']];
-    fan.innerHTML=top.map((c,i)=>`<a data-open="${c.id}" style="--r:${pose[i][0]};--x:${pose[i][1]};z-index:${i===1?2:1}" title="${esc(c.name)}"><img src="img/${esc(c.img)}.jpg" alt="${esc(c.name)}"><span>${money(askOf(c))} · ${esc(c.name.split(' - ')[0])}</span></a>`).join('');
+    fan.innerHTML=top.map((c,i)=>`<a data-open="${c.id}" style="--r:${pose[i][0]};--x:${pose[i][1]};z-index:${i===1?2:1}" title="${esc(c.name)}" class="${boxed(c).trim()}">${picOf(c)}<span>${money(askOf(c))} · ${esc(c.name.split(' - ')[0])}</span></a>`).join('');
   }
   $('fan').addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o){e.preventDefault();openBuy(Number(o.dataset.open))}});
   function renderMeta(){
-    renderFan();
+    renderFan(); renderAway();
     const avail=cards.filter(c=>!c.sold);
     $('stCount').textContent=avail.reduce((n,c)=>n+c.qty,0)||'—';
     $('stUnique').textContent=cards.length?`${avail.length} listings${cards.length-avail.length?`, ${cards.length-avail.length} sold`:''}`:'nothing synced yet';
@@ -734,11 +1078,12 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     db.collection('cards').onSnapshot(snap=>{
       cards=snap.docs.filter(d=>d.exists).map(d=>({id:Number(d.id),...d.data()}));
       byId={}; cards.forEach(c=>byId[c.id]=c);
-      rebuildFilters(); renderMeta(); render();
-      updateCartBtn(); if(view==='placed'){} else if(view==='cart')openCart(); else if(cur){if(byId[cur.id]){cur=byId[cur.id];drawBuy()}else closeBuy()}
+      rebuildFilters(); renderMeta(); render(); renderExtras();
+      updateCartBtn(); if(view==='placed'||view==='extra'){} else if(view==='cart')openCart(); else if(cur){if(byId[cur.id]){cur=byId[cur.id];drawBuy()}else closeBuy()}
     },e=>{$('grid').innerHTML=`<div class="empty">Could not load the inventory (${esc(e.code)}). Reload to try again.</div>`});
     db.doc('meta/site').onSnapshot(s=>{meta=s.exists?s.data():null;renderMeta()});
-    db.doc('private/summary').onSnapshot(s=>{priv=s.exists?s.data():null;renderOwner();renderMeta();render();
+    db.doc('private/extraCosts').onSnapshot(s=>{xcost=(s.exists&&s.data().costs)||{};render();renderExtras()},()=>{});
+    db.doc('private/summary').onSnapshot(s=>{priv=s.exists?s.data():null;renderOwner();renderMeta();render();renderExtras();
       if(priv&&location.hash==='#owner')showTab('owner');});
     const user=await claude.use('user');
     if(user&&!priv&&(await user.canEdit()))$('whoPill').textContent='Editor';
@@ -747,3 +1092,4 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   boot();
 })();
 </script>
+
