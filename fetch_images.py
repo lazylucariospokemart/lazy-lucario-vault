@@ -4,8 +4,9 @@ Two jobs:
   1. Scanner pictures: any image dropped in incoming/ whose filename starts with a
      TCGplayer id (42367.jpg, 42367_front.png, ...) is resized to a max height of
      437px and saved as img/<id>.jpg. The original is then moved to incoming/done/.
-  2. Missing pictures: every card in export/cards/ with an "img" id but no img/<id>.jpg
-     is downloaded from TCGplayer's image CDN, resized and saved the same way.
+  2. Missing pictures: every card in export/cards/ with a TCGplayer id ("img" on singles,
+     "tcgId" on sealed product and slabs) but no img/<id>.jpg is downloaded from
+     TCGplayer's image CDN, resized and saved the same way.
 
 This script only ever ADDS files to img/. It never deletes or overwrites anything.
 Usage: python3 -I fetch_images.py
@@ -107,9 +108,11 @@ def missing_pictures():
             d = d.get('data', d)
         except Exception:
             continue
-        tid = str(d.get('img') or '').strip()
-        if tid.isdigit():
-            ids.add(tid)
+        # singles carry a TCGplayer id in "img"; sealed product and slabs carry it in "tcgId"
+        for key in ('img', 'tcgId'):
+            tid = str(d.get(key) or '').strip()
+            if tid.isdigit():
+                ids.add(tid)
     want = sorted(t for t in ids if not os.path.exists(os.path.join(IMG_DIR, f'{t}.jpg')))
     print(f'{len(ids)} cards with img ids, {len(want)} missing pictures')
     saved = failed = 0
