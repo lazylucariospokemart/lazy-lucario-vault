@@ -259,6 +259,9 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
 .pill.awayp{background:var(--warn);color:var(--bg);border-color:transparent}
 .form .photoRow label.btn{display:inline-flex;align-items:center;text-transform:none;letter-spacing:0;font:800 13px var(--body);color:var(--fg)}
 .why.down{color:var(--down)}
+.scanbox{border:1px dashed var(--line);border-radius:12px;padding:10px 12px}
+.scanbox video{width:100%;max-width:420px;border-radius:10px;background:#000;display:block}
+.form input.unread{border-color:var(--warn);box-shadow:0 0 0 2px color-mix(in srgb,var(--warn) 25%,transparent)}
 
 @media (max-width:760px){.hero-in{grid-template-columns:1fr;padding:22px 18px 20px}.fan{height:220px}.fan a{width:min(40%,140px)}}
 @media (max-width:560px){.sheet{grid-template-columns:1fr}.sheet .pic{max-width:200px;margin:0 auto}}
@@ -487,6 +490,14 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   // your own photos: uploaded on the Owner desk, served from the vault here and from photos/ on the public site
   const photoSrc=c=>(c&&/^[0-9a-f]{32}$/.test(c.photo||''))?(window.VAULT_DATA?`photos/${c.photo}.jpg`:`/_blob/${c.photo}`):'';
   let assetsNs; async function getAssets(){if(assetsNs===undefined){try{assetsNs=await claude.use('assets')}catch(e){assetsNs=null}}return assetsNs}
+  // slab label scanning: the page shows Claude a photo of the slab and gets the label back as JSON (viewer allows it once)
+  let sampleFn; async function getSample(){if(sampleFn===undefined){try{sampleFn=await claude.use('sample')}catch(e){sampleFn=null}}return sampleFn}
+  let camStream=null; function stopCam(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}const b=$('x_camBox');if(b)b.hidden=true}
+  const SLAB_PROMPT='This photo shows a graded Pokémon trading card slab (PSA, CGC, BGS, TAG, ACE, SGC or similar). Read the LABEL and reply with only a JSON object with these keys: '
+    +'{"grader":one of PSA, CGC, BGS, TAG, ACE, SGC or Other; "grade":the numeric grade exactly as printed, like "10" or "9.5" (just the number, not words like GEM MT); "cert":the certification or serial number, digits only; '
+    +'"name":the card name as printed including suffixes like ex, V, VMAX, GX; "set":the set name as printed; "number":the card number as printed, like "215/203"; "year":the year if printed; "language":"English" unless the label says Japanese or another language}. '
+    +'Use "" for anything you cannot read clearly; never guess. Example: {"grader":"PSA","grade":"10","cert":"12345678","name":"Umbreon VMAX","set":"SWSH Evolving Skies","number":"215/203","year":"2021","language":"English"}';
+  const certLink=(g,c)=>!c?'':g==='PSA'?`https://www.psacard.com/cert/${encodeURIComponent(c)}`:g==='CGC'?`https://www.cgccards.com/certlookup/${encodeURIComponent(c)}/`:g==='TAG'?`https://my.taggrading.com/card/${encodeURIComponent(c)}`:g==='BGS'?'https://www.beckett.com/grading/card-lookup':'';
   async function shrinkPhoto(file){
     let src; try{src=await createImageBitmap(file,{imageOrientation:'from-image'})}catch(e){src=await new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>no(new Error('bad image'));im.src=URL.createObjectURL(file)})}
     const w=src.width,h=src.height,sc=Math.min(1,1400/Math.max(w,h));
@@ -669,7 +680,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
   // ---- card sheet (details + add to cart)
   let cur=null, qty=1;
   function openBuy(id){cur=byId[id];if(!cur)return;qty=1;drawBuy();$('buy').hidden=false}
-  function closeBuy(){$('buy').hidden=true;$('buy').innerHTML='';cur=null;view=null}
+  function closeBuy(){stopCam();$('buy').hidden=true;$('buy').innerHTML='';cur=null;view=null}
   let view=null; // 'card' | 'cart'
   function drawBuy(){
     if(!cur) return; view='card';
@@ -936,6 +947,10 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
         <div class="set">Saves to the site right away and goes live on the public storefront at the next hourly publish. What you paid stays private.</div>
         <form class="form" id="xform" novalidate>
           <div class="wide seg"><label class="radio"><input type="radio" name="x_kind" value="sealed" ${kind==='sealed'?'checked':''} ${c?'disabled':''}> 📦 Sealed product</label><label class="radio"><input type="radio" name="x_kind" value="slab" ${kind==='slab'?'checked':''} ${c?'disabled':''}> 🏅 Graded slab</label></div>
+          <div class="wide kg scanbox" id="x_scan"><div class="sect" style="margin:0 0 6px">Scan the label</div>
+            <div class="photoRow"><label class="btn" style="flex:0 0 auto;cursor:pointer">📷 Take photo<input id="x_scanFile" type="file" accept="image/*" capture="environment" hidden></label><button type="button" class="btn ghost" id="x_scanCam">🎥 Webcam</button><span class="why" id="x_scanMsg">Snap the slab's label and the fields below fill in. On the PC: take the picture with the Windows Camera app or your phone, then drag it here or paste it (Ctrl+V).</span></div>
+            <div id="x_camBox" hidden style="margin-top:8px"><video id="x_cam" autoplay playsinline muted></video><div class="cta" style="grid-template-columns:auto auto;margin-top:8px"><button type="button" class="btn primary" id="x_snap" style="flex:0 0 auto">Snap</button><button type="button" class="btn" id="x_camClose" style="flex:0 0 auto">Close camera</button></div></div>
+          </div>
           <label class="wide"><span id="x_nameL">Product name</span><input id="x_name" maxlength="120" value="${val('name')}" placeholder="e.g. Surging Sparks Booster Box"></label>
           <label class="ks">Product type<select id="x_sealedType">${opt(SEALED_TYPES,c&&c.sealedType||'Booster Box')}</select></label>
           <label class="kg">Grader<select id="x_grader">${opt(GRADERS,c&&c.grader||'PSA')}</select></label>
@@ -983,6 +998,53 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       $('x_prevNote').className=bad||(g('img')&&!safeUrl(g('img')))?'note down':'note';
     };
     $('xform').addEventListener('input',sync); $('xform').addEventListener('change',e=>{if(e.target.type!=='file')sync()}); $('xform').addEventListener('submit',e=>e.preventDefault()); sync(); pf.wire();
+    // ---- scan the slab label
+    const smsg=(t,bad)=>{const m=$('x_scanMsg');if(m){m.textContent=t;m.className=bad?'why down':'why'}};
+    let canScan=null;
+    (async()=>{const sp=await getSample();try{canScan=!!(sp&&(await sp.limits()).images)}catch(e){canScan=false}
+      if(!canScan)smsg('Label reading isn\'t available in this view (try opening the vault in Safari or Chrome). Take photo still sets the listing picture.')})();
+    let scanning=false;
+    async function usePhoto(blob,note){const a=await getAssets();if(!a)return false;try{const up=await a.upload(blob);photo=up.id;sync();const pm=$('x_photoMsg'),rm=$('x_rmPhoto');if(pm){pm.className='why';pm.textContent=note||'Using this photo. Save to keep it.'}if(rm)rm.hidden=false;return true}catch(e){return false}}
+    async function scanSlab(blob){
+      if(scanning)return; scanning=true;
+      ['grade','cert','name','set','number'].forEach(k=>$('x_'+k).classList.remove('unread'));
+      smsg('Reading the label…');
+      try{
+        const sp=await getSample();
+        const small=await shrinkPhoto(blob);
+        if(!sp||canScan===false){const ok=await usePhoto(small,'Using this photo as the listing picture. Save to keep it.');smsg(ok?'Photo set. Label reading isn\'t available in this view, so type the label details in.':'Couldn\'t upload that photo. Try again.',!ok);return}
+        const r=await sp.json(SLAB_PROMPT,{images:[small],modelTier:'default'});
+        const d=r&&typeof r==='object'?r:{}; const t=k=>String(d[k]??'').trim();
+        const grader=GRADERS.includes(t('grader'))?t('grader'):(t('grader')?'Other':'');
+        if(grader)$('x_grader').value=grader;
+        const grade=t('grade').replace(/[^0-9.]/g,''); const cert=t('cert').replace(/\D/g,'');
+        $('x_grade').value=grade; $('x_cert').value=cert;
+        if(t('name'))$('x_name').value=t('name'); if(t('set'))$('x_set').value=t('set'); if(t('number'))$('x_number').value=t('number');
+        const lang=t('language'); if(lang)$('x_language').value=['English','Japanese','Korean','Chinese'].find(l=>lang.toLowerCase().startsWith(l.toLowerCase()))||'Other';
+        const blank=[['grade',grade],['cert',cert],['name',t('name')],['set',t('set')],['number',t('number')]].filter(([k,v])=>!v).map(([k])=>{$('x_'+k).classList.add('unread');return k});
+        sync();
+        const link=certLink(grader,cert);
+        const m=$('x_scanMsg'); m.className=blank.length?'why down':'why';
+        m.innerHTML=(blank.length?`Couldn't read: ${blank.join(', ')}. Fill those in by hand. `:'Label read. Check the fields, then set your price. ')+(link?`<a href="${esc(link)}" target="_blank" rel="noopener">Verify cert ${esc(cert)}</a>`:'');
+        await usePhoto(small,'Using the scan photo. Save to keep it.');
+      }catch(e){
+        const code=e&&e.code;
+        smsg(code==='not_granted'||code==='sampling_disabled'?'Label scanning isn\'t allowed for this page. Fill the fields in by hand.':code==='rate_limited'?'Too many scans for now; wait a minute and try again.':code==='image_rejected'?'That photo couldn\'t be used. Try a JPG or PNG.':code==='invalid_json'||code==='refused'||code==='empty_completion'?'Couldn\'t make out the label. Try a closer, straighter photo of the label.':'Scan didn\'t go through. Try again.',true);
+        if(code==='not_granted'||code==='sampling_disabled'||code==='not_declared'||code==='images_unavailable'){canScan=false;try{await usePhoto(await shrinkPhoto(blob),'Using this photo as the listing picture. Save to keep it.')}catch(e2){}}
+      }finally{scanning=false}
+    }
+    $('x_scanFile').onchange=()=>{const f=$('x_scanFile').files&&$('x_scanFile').files[0];$('x_scanFile').value='';if(f)scanSlab(f)};
+    $('x_scanCam').onclick=async()=>{
+      try{camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});$('x_cam').srcObject=camStream;$('x_camBox').hidden=false;smsg('Hold the label up to the camera and tap Snap.')}
+      catch(e){smsg((e&&e.name==='NotAllowedError')?'This page runs inside claude.ai, which doesn\'t pass the webcam through. Take the picture with the Windows Camera app or your phone, then drag it onto this box or paste it (Ctrl+V).':'No webcam found. Take the picture another way and drag or paste it here.',true)}
+    };
+    const sbox=$('x_scan');
+    sbox.addEventListener('dragover',e=>{e.preventDefault();sbox.style.borderColor='var(--accent)'});
+    sbox.addEventListener('dragleave',()=>{sbox.style.borderColor=''});
+    sbox.addEventListener('drop',e=>{e.preventDefault();sbox.style.borderColor='';const f=[...(e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f)scanSlab(f);else smsg('Drop an image file (JPG or PNG).',true)});
+    $('buy').addEventListener('paste',e=>{if(view!=='extra'||kind!=='slab')return;const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();const f=it.getAsFile();if(f)scanSlab(f)}});
+    $('x_camClose').onclick=stopCam;
+    $('x_snap').onclick=()=>{const v=$('x_cam');if(!v.videoWidth)return;const cv=document.createElement('canvas');cv.width=v.videoWidth;cv.height=v.videoHeight;cv.getContext('2d').drawImage(v,0,0);cv.toBlob(b=>{stopCam();if(b)scanSlab(b)},'image/jpeg',0.92)};
     $('xsave').onclick=async()=>{
       const msg=$('xmsg'), bad=m=>{msg.textContent=m;msg.className='note down'};
       const num=k=>{const v=g(k);return v===''?null:Math.round(parseFloat(v)*100)/100};
