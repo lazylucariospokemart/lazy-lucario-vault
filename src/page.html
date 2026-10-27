@@ -526,7 +526,12 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
       if(p) return `<img src="${esc(p)}" alt="${esc(c.name)}" loading="lazy"${stock?` onerror="this.onerror=null;this.src='${stock}'"`:''}>`;
       return stock?`<img src="${stock}" alt="${esc(c.name)}" loading="lazy">`:'';
     }
-    return phOf(c)+(u?`<img src="${esc(u)}" alt="${esc(c.name)}" loading="lazy" style="position:relative" onerror="this.remove()">`:'')+(k==='slab'&&u&&slabLabel(c)?`<div class="slabtag">${esc(slabLabel(c))}</div>`:'')+(k==='sealed'&&c.sealedType?`<div class="sealtag">${esc(c.sealedType)}</div>`:'');
+    // sealed / slab: your photo first, then the saved copy in img/<tcgId>.jpg, then TCGplayer's link
+    const local=(window.VAULT_DATA&&/^\d+$/.test(String(c.tcgId||'')))?`img/${c.tcgId}.jpg`:'';  // only on the public site; the Owner desk has no img/ folder
+    const chain=[p,local,safeUrl(c.imgUrl)].filter(Boolean);
+    const src=chain[0]||'', rest=chain.slice(1);
+    const onerr=rest.length?`var q=${JSON.stringify(rest).replace(/"/g,'&quot;')};this.onerror=function(){var n=q.shift();if(n)this.src=n;else this.remove()};this.src=q.shift()`:'this.remove()';
+    return phOf(c)+(src?`<img src="${esc(src)}" alt="${esc(c.name)}" loading="lazy" style="position:relative" onerror="${onerr}">`:'')+(k==='slab'&&src&&slabLabel(c)?`<div class="slabtag">${esc(slabLabel(c))}</div>`:'')+(k==='sealed'&&c.sealedType?`<div class="sealtag">${esc(c.sealedType)}</div>`:'');
   }
   function detailOf(c,short){
     const k=kindOf(c);
