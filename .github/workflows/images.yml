@@ -1,0 +1,43 @@
+name: Save card pictures
+on:
+  push:
+    branches: [main]
+    paths: ['export/**', 'incoming/**']
+  schedule:
+    - cron: '23 11 * * *'   # daily, 06:23 Chicago (CDT) / 05:23 (CST)
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: images
+  cancel-in-progress: false
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow
+      - run: python3 -I fetch_images.py
+      - name: Commit new pictures
+        id: commit
+        run: |
+          git add img incoming
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "nothing new"
+          else
+            git -c user.name="Vault Publisher" -c user.email="bfinney28@gmail.com" \
+              commit -qm "Save card pictures"
+            git pull --rebase origin main
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Redeploy site
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main
