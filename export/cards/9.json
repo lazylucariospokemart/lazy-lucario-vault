@@ -1,6 +1,6 @@
 {
   "added": "2026-10-18",
-  "ask": 120,
+  "ask": 50,
   "chg7": -11.67,
   "cond": "NM",
   "img": "45123",
@@ -8,6 +8,7 @@
   "name": "Vaporeon (12)",
   "notes": "",
   "number": "12/64",
+  "photo": null,
   "price": 47.47,
   "printing": "Unlimited Holofoil",
   "qty": 1,
