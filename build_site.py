@@ -5,6 +5,15 @@ os.makedirs(OUT,exist_ok=True)
 cards={}
 for f in glob.glob('export/cards/*.json'):
     cards[os.path.splitext(os.path.basename(f))[0]]=json.load(open(f))
+# latest market prices for unsold singles (prices/latest.json, keyed "<tcgplayer id>|<condition>"); the Owner desk catches up on the Publisher's next run
+if os.path.exists('prices/latest.json'):
+    try: _p=json.load(open('prices/latest.json'))
+    except Exception: _p={}
+    for c in cards.values():
+        if c.get('kind') or c.get('sold') or not c.get('img'): continue
+        e=_p.get(f"{c['img']}|{c.get('cond') or 'NM'}")
+        if e and e.get('price') is not None:
+            c['price']=round(float(e['price']),2); c['chg7']=e.get('chg7')
 meta=json.load(open('export/meta/site.json')) if os.path.exists('export/meta/site.json') else {}
 meta['updated']=datetime.date.today().isoformat()
 meta.pop('orderHook',None)  # never publish a raw Discord webhook

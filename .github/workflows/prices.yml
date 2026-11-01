@@ -1,0 +1,29 @@
+name: Refresh card prices
+on:
+  schedule:
+    - cron: '41 13 * * *'   # daily, 7:41 AM Chicago (CST) / 8:41 (CDT), before the 8:17/1:17/6:17 syncs pick it up
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: prices
+  cancel-in-progress: false
+jobs:
+  prices:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch prices
+        env:
+          JUSTTCG_KEY: ${{ secrets.JUSTTCG_KEY }}
+        run: python3 -I fetch_prices.py
+      - name: Commit
+        run: |
+          git add prices
+          if git diff --cached --quiet; then echo "no price changes"; exit 0; fi
+          git -c user.name="Vault Publisher" -c user.email="bfinney28@gmail.com" commit -qm "Refresh card prices"
+          git pull --rebase origin main
+          git push
