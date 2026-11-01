@@ -11,5 +11,6 @@
   "printing": "Unlimited",
   "qty": 1,
   "rarity": "Common",
-  "set": "Team Rocket"
+  "set": "Team Rocket",
+  "sold": true
 }
