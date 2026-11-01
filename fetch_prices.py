@@ -6,7 +6,7 @@ per printing, scaled by condition, with the 7-day change worked out from this fo
 Never touches the Owner desk; the Vault Publisher applies the file to it on its next run.
 Usage: python3 -I fetch_prices.py
 """
-import json, os, sys, time, urllib.request, urllib.parse
+import json, os, sys, time, datetime, urllib.request, urllib.parse
 import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # -I mode: find vault_prices next to this script
 
 from vault_prices import (load_prices, save_prices, record_history, chg7_from_history, key,
@@ -85,11 +85,10 @@ def via_tcgplayer(combos):
         if t in os.environ.get('DEBUG_IDS', '').split(','):
             print(f'  DEBUG {t}: {json.dumps(pts)[:1500]}')
         for cond, printing, language in lst:
-            want = norm_printing(printing).lower()
+            # TCGplayer's public feed only knows "Normal" and "Foil": any holo/foil printing is Foil
+            want = 'foil' if any(w in norm_printing(printing).lower() for w in ('holo', 'foil')) else 'normal'
             cand = [p for p in pts if isinstance(p.get('marketPrice'), (int, float)) and p['marketPrice'] > 0]
-            hit = next((p for p in cand if (p.get('printingType') or '').lower() == want), None) \
-                or next((p for p in cand if want.split()[-1] in (p.get('printingType') or '').lower()), None) \
-                or (cand[0] if cand else None)
+            hit = next((p for p in cand if (p.get('printingType') or '').lower() == want), None) or (cand[0] if cand else None)
             if hit:
                 price = round(hit['marketPrice'] * COND_FACTOR.get(cond_abbr(cond), 1.0), 2)
                 out[key(t, cond)] = (price, None)
@@ -109,8 +108,13 @@ if __name__ == '__main__':
     found = via_justtcg(combos) if KEY else via_tcgplayer(combos)
     src = 'justtcg' if KEY else 'tcgplayer'
     at = now_iso(); updated = 0
+    cutoff = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=7)).isoformat()
     for k, (price, chg) in found.items():
         tid, cond = k.split('|')
+        old = prices.get(k, {})
+        # the public feed has no condition data: never let it overwrite a Card Vault / JustTCG price under a week old
+        if src == 'tcgplayer' and old.get('src') in ('card-vault', 'justtcg') and (old.get('at') or '') > cutoff:
+            continue
         printing = next((p for c, p, l in combos.get(tid, []) if c == cond), 'Normal')
         if chg is None:
             chg = chg7_from_history(k, price)
