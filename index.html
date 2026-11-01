@@ -1091,7 +1091,7 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
     renderFan(); renderAway();
     const avail=cards.filter(c=>!c.sold);
     $('stCount').textContent=avail.reduce((n,c)=>n+c.qty,0)||'—';
-    $('stUnique').textContent=cards.length?`${avail.length} listings${cards.length-avail.length?`, ${cards.length-avail.length} sold`:''}`:'nothing synced yet';
+    $('stUnique').textContent=cards.length?`${avail.length} listings${priv&&cards.length-avail.length?`, ${cards.length-avail.length} sold`:''}`:'nothing synced yet'; // sold count is owner-only
     $('stSets').textContent=new Set(cards.map(c=>c.set)).size||'—';
     $('stShip').textContent=money(shop().ship); $('stShipNote').textContent=`tracked · free at ${money(shop().freeShipAt)} or ${Math.ceil(shop().bundleMax/shop().bundlePct)}+ cards`;
     const d=(priv&&priv.report&&priv.report.generated_at)||(meta&&meta.updated);
