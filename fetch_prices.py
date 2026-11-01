@@ -82,6 +82,8 @@ def via_tcgplayer(combos):
             print(f'  {t}: {e}'); continue
         if isinstance(pts, dict):
             pts = pts.get('result') or pts.get('data') or []
+        if t in os.environ.get('DEBUG_IDS', '').split(','):
+            print(f'  DEBUG {t}: {json.dumps(pts)[:1500]}')
         for cond, printing, language in lst:
             want = norm_printing(printing).lower()
             cand = [p for p in pts if isinstance(p.get('marketPrice'), (int, float)) and p['marketPrice'] > 0]

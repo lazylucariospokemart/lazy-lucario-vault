@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '41 13 * * *'   # daily, 7:41 AM Chicago (CST) / 8:41 (CDT), before the 8:17/1:17/6:17 syncs pick it up
   workflow_dispatch:
+    inputs:
+      debug_ids:
+        description: 'Comma-separated TCGplayer ids to print raw price data for'
+        required: false
+        default: ''
 permissions:
   contents: write
 concurrency:
@@ -19,6 +24,7 @@ jobs:
       - name: Fetch prices
         env:
           JUSTTCG_KEY: ${{ secrets.JUSTTCG_KEY }}
+          DEBUG_IDS: ${{ inputs.debug_ids }}
         run: python3 -I fetch_prices.py
       - name: Commit
         run: |
