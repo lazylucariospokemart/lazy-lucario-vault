@@ -1,10 +1,10 @@
 {
   "away": {
-    "end": "2026-11-01",
-    "message": "Sioux Falls Card Show",
+    "end": "2026-11-09",
+    "message": "All American Card Expo - Overland Park, Kansas",
     "mode": "pause",
     "on": true,
-    "start": "2026-10-31"
+    "start": "2026-11-05"
   },
   "bundleMax": 10,
   "bundlePct": 2.5,
