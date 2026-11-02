@@ -1,6 +1,6 @@
 {
   "added": "2026-10-31",
-  "chg7": null,
+  "chg7": -0.05,
   "cond": "MP",
   "img": "107006",
   "language": "English",
@@ -8,6 +8,7 @@
   "notes": "",
   "number": "011/102",
   "price": 56.3,
+  "priceAt": "2026-11-02T14:40:51Z",
   "printing": "Unlimited Holofoil",
   "qty": 1,
   "rarity": "Holo Rare",

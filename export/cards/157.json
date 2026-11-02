@@ -1,6 +1,6 @@
 {
   "added": "2026-10-31",
-  "chg7": null,
+  "chg7": 0,
   "cond": "NM",
   "img": "575415",
   "language": "Japanese",
@@ -8,6 +8,7 @@
   "notes": "",
   "number": "N/A",
   "price": 53.52,
+  "priceAt": "2026-11-02T14:40:51Z",
   "printing": "Holofoil - Japanese",
   "qty": 1,
   "rarity": "Holo Rare",
