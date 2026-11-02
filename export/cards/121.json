@@ -1,6 +1,6 @@
 {
   "added": "2026-10-20",
-  "chg7": 0,
+  "chg7": null,
   "cond": "LP",
   "img": "612851",
   "language": "Japanese",
@@ -8,6 +8,7 @@
   "notes": "",
   "number": "053/080",
   "price": 18.26,
+  "priceAt": "2026-11-01T20:16:01Z",
   "printing": "1st Edition Holofoil - Japanese",
   "qty": 1,
   "rarity": "Holo Rare",

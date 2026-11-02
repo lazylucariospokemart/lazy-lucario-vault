@@ -1,6 +1,6 @@
 {
   "added": "2026-10-20",
-  "chg7": 0,
+  "chg7": null,
   "cond": "NM",
   "img": "576032",
   "language": "Japanese",
@@ -8,6 +8,7 @@
   "notes": "",
   "number": "082/128",
   "price": 67.5,
+  "priceAt": "2026-11-01T20:16:01Z",
   "printing": "1st Edition - Japanese",
   "qty": 1,
   "rarity": "Rare",
