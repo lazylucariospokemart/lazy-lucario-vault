@@ -12,5 +12,6 @@
   "printing": "Reverse Holofoil",
   "qty": 1,
   "rarity": "Rare",
-  "set": "EX Emerald"
+  "set": "EX Emerald",
+  "sold": true
 }

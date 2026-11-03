@@ -12,5 +12,6 @@
   "printing": "Reverse Holofoil",
   "qty": 1,
   "rarity": "Common",
-  "set": "EX Dragon"
+  "set": "EX Dragon",
+  "sold": true
 }
