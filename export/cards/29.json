@@ -1,6 +1,6 @@
 {
   "added": "2026-10-18",
-  "chg7": null,
+  "chg7": 0,
   "cond": "LP",
   "img": "574778",
   "language": "Japanese",
@@ -8,6 +8,7 @@
   "notes": "",
   "number": "160/150",
   "price": 49.99,
+  "priceAt": "2026-11-06T14:36:46Z",
   "printing": "Holofoil - Japanese",
   "qty": 1,
   "rarity": "Super Rare",
