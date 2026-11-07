@@ -13,5 +13,8 @@
   "qty": 1,
   "rarity": "Classic Collection",
   "set": "ME: 30th Celebration Classic Collection",
-  "sold": false
+  "sold": true,
+  "soldAt": "2026-11-06T18:00:00.000Z",
+  "soldPrice": 150,
+  "soldVia": "show"
 }

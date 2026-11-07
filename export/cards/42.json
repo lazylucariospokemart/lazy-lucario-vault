@@ -12,5 +12,9 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Special Illustration Rare",
-  "set": "ME02: Phantasmal Flames"
+  "set": "ME02: Phantasmal Flames",
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 10,
+  "soldVia": "show"
 }

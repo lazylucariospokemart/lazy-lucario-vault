@@ -19,7 +19,10 @@
   "qty": 1,
   "rarity": "",
   "set": "",
-  "sold": false,
+  "sold": true,
+  "soldAt": "2026-11-06T18:00:00.000Z",
+  "soldPrice": 100,
+  "soldVia": "show",
   "tcgId": "",
   "wt": 4
 }

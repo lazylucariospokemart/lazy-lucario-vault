@@ -12,5 +12,9 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Illustration Rare",
-  "set": "SV01: Scarlet & Violet Base Set"
+  "set": "SV01: Scarlet & Violet Base Set",
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 45,
+  "soldVia": "show"
 }
