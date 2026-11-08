@@ -13,5 +13,8 @@
   "qty": 1,
   "rarity": "Ultra Rare",
   "set": "SV: Scarlet & Violet 151",
-  "sold": false
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 30,
+  "soldVia": "show"
 }

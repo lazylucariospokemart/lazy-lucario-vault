@@ -14,5 +14,8 @@
   "qty": 1,
   "rarity": "Mega Attack Rare",
   "set": "ME: Ascended Heroes",
-  "sold": false
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 25,
+  "soldVia": "show"
 }

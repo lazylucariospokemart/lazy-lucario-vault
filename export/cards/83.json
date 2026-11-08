@@ -12,5 +12,9 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Holo Rare",
-  "set": "Base Set"
+  "set": "Base Set",
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 35,
+  "soldVia": "show"
 }

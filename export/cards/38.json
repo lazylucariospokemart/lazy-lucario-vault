@@ -12,5 +12,9 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Ultra Rare",
-  "set": "SM - Unified Minds"
+  "set": "SM - Unified Minds",
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 35,
+  "soldVia": "show"
 }

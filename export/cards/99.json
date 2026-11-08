@@ -12,5 +12,9 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Ultra Rare",
-  "set": "SWSH10: Astral Radiance Trainer Gallery"
+  "set": "SWSH10: Astral Radiance Trainer Gallery",
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 5,
+  "soldVia": "show"
 }

@@ -12,5 +12,9 @@
   "printing": "Holofoil - Japanese",
   "qty": 1,
   "rarity": "Art Rare",
-  "set": "SV2a: Pokemon Card 151"
+  "set": "SV2a: Pokemon Card 151",
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 15,
+  "soldVia": "show"
 }
