@@ -18,7 +18,10 @@
   "rarity": "",
   "sealedType": "Collection / Premium Box",
   "set": "ME: 30th Celebration",
-  "sold": false,
+  "sold": true,
+  "soldAt": "2026-11-07T18:00:00.000Z",
+  "soldPrice": 45,
+  "soldVia": "show",
   "tcgId": "704155",
   "wt": 14
 }
