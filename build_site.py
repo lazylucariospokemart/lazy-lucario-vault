@@ -28,7 +28,7 @@ page=page.replace('<meta name="claude:viewport-fit-sides" content="cover">\n',''
 _a='${c.sold?\'<div class="stamp">SOLD</div>\':\'\'}'
 if _a in page: page=page.replace(_a,_a+'${c._new?\'<div class="newtag">NEW</div>\':\'\'}',1)
 else: print('warning: NEW tag anchor not found in page')
-page=page.replace('</style>','.newtag{position:absolute;top:8px;left:8px;z-index:3;background:linear-gradient(135deg,#6ee7f9,#a78bfa);color:#0b1020;font-weight:800;font-size:11px;letter-spacing:.08em;padding:3px 8px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}</style>',1)
+page=page.replace('</style>','.newtag{position:absolute;top:9px;left:9px;z-index:3;background:linear-gradient(135deg,#6ee7f9,#a78bfa);color:#0b1020;font-weight:900;font-size:14px;line-height:1;letter-spacing:.09em;padding:6px 12px;border-radius:999px;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.45),0 0 0 1px rgba(167,139,250,.5);transform:rotate(-6deg);pointer-events:none;animation:newpop .5s cubic-bezier(.2,1.6,.4,1) both}@keyframes newpop{from{transform:rotate(-6deg) scale(.4);opacity:0}to{transform:rotate(-6deg) scale(1);opacity:1}}@media (prefers-reduced-motion:reduce){.newtag{animation:none}}</style>',1)
 title_m=re.search(r'<title>(.*?)</title>',page)
 # sold listings fall off the public page after HIDE_SOLD_DAYS (they stay on the Owner desk, in data.json and in sales.json).
 # Age = soldAt if Lazy set one, else the first build that saw the card as sold (tracked in sold_seen.json).
