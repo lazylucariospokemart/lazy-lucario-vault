@@ -12,5 +12,9 @@
   "printing": "Normal",
   "qty": 1,
   "rarity": "Rare",
-  "set": "Arceus"
+  "set": "Arceus",
+  "sold": true,
+  "soldAt": "2026-11-08T18:00:00.000Z",
+  "soldPrice": 45,
+  "soldVia": "show"
 }

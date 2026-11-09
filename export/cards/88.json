@@ -12,5 +12,9 @@
   "printing": "Unlimited Holofoil",
   "qty": 1,
   "rarity": "Holo Rare",
-  "set": "Neo Discovery"
+  "set": "Neo Discovery",
+  "sold": true,
+  "soldAt": "2026-11-08T18:00:00.000Z",
+  "soldPrice": 20,
+  "soldVia": "show"
 }
