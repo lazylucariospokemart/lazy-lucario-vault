@@ -1244,4 +1244,35 @@ footer{padding-block:10px 40px;font-size:12px;color:var(--muted);display:flex;ga
 })();
 </script>
 
-</body></html>
+<script>
+(function(){
+  var KEY='vault-notrack';
+  try{
+    if(location.hash==='#notrack')localStorage.setItem(KEY,'1');
+    if(location.hash==='#track')localStorage.removeItem(KEY);
+    if(localStorage.getItem(KEY))return;
+  }catch(e){}
+  var queue=[];
+  function ev(name){
+    if(window.goatcounter&&window.goatcounter.count){try{window.goatcounter.count({path:name,title:name,event:true})}catch(e){}}
+    else queue.push(name);
+  }
+  var s=document.createElement('script');
+  s.async=true; s.src='https://gc.zgo.at/count.js';
+  s.setAttribute('data-goatcounter','https://lazylucario.goatcounter.com/count');
+  s.onload=function(){var q=queue;queue=[];q.forEach(ev)};
+  document.head.appendChild(s);
+  try{var c=JSON.parse(localStorage.getItem('vault-cart')||'{}')||{};if(Object.keys(c).length)ev('visit-with-cart')}catch(e){}
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest)return;
+    if(t.closest('[data-add],#addCart,#offerAdd'))ev('add-to-cart');
+    else if(t.closest('#cartBtn,#goCart'))ev('cart-opened');
+  },true);
+  var f=window.fetch;
+  if(f)window.fetch=function(u,o){
+    var p=f.apply(this,arguments);
+    try{if(o&&o.method==='POST'&&/\/order$/.test(String(u)))p.then(function(r){if(r&&r.ok)ev('order-sent')}).catch(function(){})}catch(e){}
+    return p;
+  };
+})();
+</script></body></html>
