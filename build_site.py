@@ -25,10 +25,14 @@ if os.path.exists('export/meta/orders.json'):
 page=open(SRC).read()
 # strip the artifact-only meta tag
 page=page.replace('<meta name="claude:viewport-fit-sides" content="cover">\n','')
+_a='${c.sold?\'<div class="stamp">SOLD</div>\':\'\'}'
+if _a in page: page=page.replace(_a,_a+'${c._new?\'<div class="newtag">NEW</div>\':\'\'}',1)
+else: print('warning: NEW tag anchor not found in page')
+page=page.replace('</style>','.newtag{position:absolute;top:8px;left:8px;z-index:3;background:linear-gradient(135deg,#6ee7f9,#a78bfa);color:#0b1020;font-weight:800;font-size:11px;letter-spacing:.08em;padding:3px 8px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}</style>',1)
 title_m=re.search(r'<title>(.*?)</title>',page)
 # sold listings fall off the public page after HIDE_SOLD_DAYS (they stay on the Owner desk, in data.json and in sales.json).
 # Age = soldAt if Lazy set one, else the first build that saw the card as sold (tracked in sold_seen.json).
-HIDE_SOLD_DAYS=14
+HIDE_SOLD_DAYS=7
 today=datetime.date.today()
 try: seen=json.load(open('sold_seen.json'))
 except Exception: seen={}
@@ -41,6 +45,11 @@ for k,c in cards.items():
     try: age=(today-datetime.date.fromisoformat(d)).days
     except Exception: age=0
     if age<=HIDE_SOLD_DAYS: public[k]=c
+# NEW tag: unsold listings added in the last NEW_DAYS days (the page code below draws the badge from _new)
+NEW_DAYS=7
+for k,c in public.items():
+    try: c['_new']=(not c.get('sold')) and 0<=(today-datetime.date.fromisoformat(str(c.get('added'))[:10])).days<=NEW_DAYS
+    except Exception: c['_new']=False
 json.dump(seen,open('sold_seen.json','w'),indent=0,sort_keys=True)
 print(f"public page: {len(public)} of {len(cards)} cards ({len(cards)-len(public)} sold listings aged off)")
 data=json.dumps({'cards':public,'meta':meta},separators=(',',':'))
