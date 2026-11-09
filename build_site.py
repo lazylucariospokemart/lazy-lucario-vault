@@ -26,7 +26,24 @@ page=open(SRC).read()
 # strip the artifact-only meta tag
 page=page.replace('<meta name="claude:viewport-fit-sides" content="cover">\n','')
 title_m=re.search(r'<title>(.*?)</title>',page)
-data=json.dumps({'cards':cards,'meta':meta},separators=(',',':'))
+# sold listings fall off the public page after HIDE_SOLD_DAYS (they stay on the Owner desk, in data.json and in sales.json).
+# Age = soldAt if Lazy set one, else the first build that saw the card as sold (tracked in sold_seen.json).
+HIDE_SOLD_DAYS=14
+today=datetime.date.today()
+try: seen=json.load(open('sold_seen.json'))
+except Exception: seen={}
+seen={k:v for k,v in seen.items() if k in cards and cards[k].get('sold')}
+public={}
+for k,c in cards.items():
+    if not c.get('sold'): public[k]=c; continue
+    d=seen.setdefault(k,today.isoformat())
+    if c.get('soldAt'): d=str(c['soldAt'])[:10]
+    try: age=(today-datetime.date.fromisoformat(d)).days
+    except Exception: age=0
+    if age<=HIDE_SOLD_DAYS: public[k]=c
+json.dump(seen,open('sold_seen.json','w'),indent=0,sort_keys=True)
+print(f"public page: {len(public)} of {len(cards)} cards ({len(cards)-len(public)} sold listings aged off)")
+data=json.dumps({'cards':public,'meta':meta},separators=(',',':'))
 # data.json is what the order relay reads to check stock and prices
 json.dump({'cards':cards,'meta':meta,'appliedOrders':applied,'builtAt':datetime.datetime.now(datetime.timezone.utc).isoformat()},open(f'{OUT}/data.json','w'),separators=(',',':'))
 html=('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
