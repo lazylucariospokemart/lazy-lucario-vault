@@ -3,7 +3,7 @@
     "end": "2026-11-09",
     "message": "All American Card Expo - Overland Park, Kansas",
     "mode": "pause",
-    "on": true,
+    "on": false,
     "start": "2026-11-05"
   },
   "bundleMax": 10,

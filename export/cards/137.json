@@ -13,5 +13,8 @@
   "qty": 1,
   "rarity": "Special Illustration Rare",
   "set": "ME: Ascended Heroes",
-  "sold": false
+  "sold": true,
+  "soldAt": "2026-11-08T18:00:00.000Z",
+  "soldPrice": 65,
+  "soldVia": "show"
 }
