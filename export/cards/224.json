@@ -1,6 +1,6 @@
 {
   "added": "2026-11-09",
-  "chg7": null,
+  "chg7": 5.65,
   "cond": "NM",
   "img": "125078",
   "language": "English",
@@ -8,6 +8,7 @@
   "notes": "",
   "number": "028/127",
   "price": 28.07,
+  "priceAt": "2026-11-10T14:34:01Z",
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Holo Rare",
