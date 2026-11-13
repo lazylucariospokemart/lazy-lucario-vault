@@ -19,6 +19,15 @@
       "on": false,
       "type": "off",
       "value": 5
+    },
+    {
+      "code": "DICORD10",
+      "ends": "2026-11-13",
+      "h": "476372043c88a10e07e2c521728f22f327652dd781a6b8f40b505194e75468c0",
+      "min": 50,
+      "on": true,
+      "type": "pct",
+      "value": 10
     }
   ],
   "discord": "https://discord.gg/PWGYVXAUZP",
