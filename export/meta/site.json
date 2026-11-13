@@ -15,18 +15,9 @@
       "code": "DISCORD10Q",
       "ends": "2026-11-13",
       "h": "4054309ccc224a1f5af93f1e318919c5a3aef00463e940715c24b02738332f6e",
-      "min": 25,
-      "on": false,
-      "type": "off",
-      "value": 5
-    },
-    {
-      "code": "DICORD10",
-      "ends": "2026-11-13",
-      "h": "476372043c88a10e07e2c521728f22f327652dd781a6b8f40b505194e75468c0",
       "min": 50,
       "on": true,
-      "type": "pct",
+      "type": "off",
       "value": 10
     }
   ],
