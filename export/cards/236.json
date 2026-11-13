@@ -13,5 +13,6 @@
   "qty": 1,
   "rarity": "Classic Collection",
   "set": "ME: 30th Celebration Classic Collection",
-  "sold": false
+  "sold": true,
+  "soldOrder": "LV-TOH2JZ"
 }

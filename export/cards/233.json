@@ -13,5 +13,6 @@
   "qty": 1,
   "rarity": "Ultra Rare",
   "set": "ME05: Pitch Black",
-  "sold": false
+  "sold": true,
+  "soldOrder": "LV-TOH2JZ"
 }
