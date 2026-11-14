@@ -16,7 +16,7 @@
       "ends": "2026-11-13",
       "h": "4054309ccc224a1f5af93f1e318919c5a3aef00463e940715c24b02738332f6e",
       "min": 50,
-      "on": true,
+      "on": false,
       "type": "off",
       "value": 10
     }
