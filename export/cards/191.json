@@ -13,5 +13,6 @@
   "qty": 1,
   "rarity": "Illustration Rare",
   "set": "ME: 30th Celebration",
-  "sold": false
+  "sold": true,
+  "soldOrder": "LV-5FLS4T"
 }

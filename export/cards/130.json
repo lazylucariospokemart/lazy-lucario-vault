@@ -13,5 +13,6 @@
   "qty": 1,
   "rarity": "Special Illustration Rare",
   "set": "ME01: Mega Evolution",
-  "sold": false
+  "sold": true,
+  "soldOrder": "LV-5FLS4T"
 }

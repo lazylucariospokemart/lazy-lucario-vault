@@ -13,5 +13,6 @@
   "qty": 1,
   "rarity": "Illustration Rare",
   "set": "ME03: Perfect Order",
-  "sold": false
+  "sold": true,
+  "soldOrder": "LV-5FLS4T"
 }
