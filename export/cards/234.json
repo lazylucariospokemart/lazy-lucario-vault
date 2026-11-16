@@ -13,5 +13,8 @@
   "qty": 1,
   "rarity": "Special Illustration Rare",
   "set": "ME05: Pitch Black",
-  "sold": false
+  "sold": true,
+  "soldAt": "2026-11-15T18:00:00.000Z",
+  "soldPrice": 57.37,
+  "soldVia": "whatnot"
 }

@@ -14,5 +14,8 @@
   "qty": 1,
   "rarity": "Special Art Rare",
   "set": "SV2a: Pokemon Card 151",
-  "sold": false
+  "sold": true,
+  "soldAt": "2026-11-15T18:00:00.000Z",
+  "soldPrice": 100,
+  "soldVia": "other"
 }

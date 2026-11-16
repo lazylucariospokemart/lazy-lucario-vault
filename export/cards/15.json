@@ -12,5 +12,9 @@
   "printing": "Holofoil",
   "qty": 1,
   "rarity": "Special Illustration Rare",
-  "set": "ME01: Mega Evolution"
+  "set": "ME01: Mega Evolution",
+  "sold": true,
+  "soldAt": "2026-11-15T18:00:00.000Z",
+  "soldPrice": 51.1,
+  "soldVia": "other"
 }
