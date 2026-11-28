@@ -10,17 +10,7 @@
   "bundlePct": 2.5,
   "cashapp": "Finney1992",
   "count": 102,
-  "coupons": [
-    {
-      "code": "BLACKFRIDAYQ15",
-      "ends": "2026-11-27",
-      "h": "1ef8b6c2e6184fc8323ddd6ebaac1f8305b7827320bde1e785d3242fa00fa7b8",
-      "min": 0,
-      "on": true,
-      "type": "pct",
-      "value": 15
-    }
-  ],
+  "coupons": [],
   "discord": "https://discord.gg/PWGYVXAUZP",
   "freeShipAt": 150,
   "orderApi": "https://vault-orders.lazylucariospokemart28.workers.dev",
